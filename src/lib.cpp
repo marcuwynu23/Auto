@@ -13,9 +13,6 @@
 
 
 
-
-
-
 // user functions
 void __termExecute(std::string command)
 {
@@ -36,7 +33,7 @@ void __readStringLine(std::string fileName){
 	if (newfile.is_open()){  
 		string tp;
 		while(getline(newfile, tp)){ 
-				__termExecute("start cmd /K "+tp);
+				__termExecute("echo "+tp+"&& start cmd /K "+tp);
 		}
 		newfile.close();
 	}
