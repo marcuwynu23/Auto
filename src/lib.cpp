@@ -33,10 +33,7 @@ void __readStringLine(std::string fileName){
 	if (newfile.is_open()){  
 		string tp;
 		while(getline(newfile, tp)){ 
-				if(tp[0] == '#'){
-					continue;
-				}
-				else{
+				if(tp[0] != '#'){
 					__termExecute("echo "+tp+"&& start cmd /K "+tp);
 				}
 		}
