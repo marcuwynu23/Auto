@@ -12,7 +12,6 @@ echo hi friend
 
 then run in terminal:
 ```
+
 auto
 ```
-
-
