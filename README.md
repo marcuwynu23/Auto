@@ -1,5 +1,8 @@
  # Auto - Window commandline Automation tool
 
+<p align="center">
+  <img width="25%" height="25%" src="https://github.com/marcuwynu23/Auto/blob/main/docs/images/1.jpg" />
+</p>
 Commandline Tool use to automate commandline execution and instance creation in window terminal
 
 How to use:
