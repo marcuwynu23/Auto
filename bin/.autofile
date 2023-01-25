@@ -1,4 +1,5 @@
+::SYNC
 # This is a comment 
-- echo Hi
+- echo hello
 - echo Hello world!
 - echo Bye
