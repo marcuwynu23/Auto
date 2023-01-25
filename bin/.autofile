@@ -1,5 +1,8 @@
-::SYNC
-# This is a comment 
+::ASYNC
+####################### This is a comment ############################ 
 - echo hello
-- echo Hello world!
++ echo Hello world!
 - echo Bye
+######################################################################
+
+
