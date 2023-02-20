@@ -29,11 +29,15 @@ specially if the a specify command can only run in ONE INSTANCE.
 
 <!-- CONTRIBUTING -->
 ## Contributing
-How to Contribute to this Project Repository:
-1. Fork the Project
-2. Create your Branch 
-3. Commit your Changes 
-4. Push to the Branch 
-5. Open a Pull Request
+# Contributing to AutoCLI
 
-Thank you in advance for your contributions! Godbless and Happy Coding! 
+We welcome contributions to the AutoCLI project! To get started, simply follow these steps:
+
+1. Fork the project to your own GitHub account
+2. Create a new branch for your changes
+3. Commit your changes to your new branch
+4. Push your branch to your forked repository
+5. Open a pull request to the main project repository
+
+Our team will review your changes and merge them if they meet our standards. By contributing to AutoCLI, you'll be helping to make the tool even better for everyone who uses it. Thank you in advance for your contributions, and happy coding!
+
