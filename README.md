@@ -11,10 +11,18 @@ AutoCLI is a user-friendly command-line automation tool for Windows users. It al
 How to use:
 
 Create a file .autofile then add commands like below in the .autofile:
-```
-# this is a comment
-- echo hello world!
-- echo hi friend
+```cmd
+# This is a comment
+
+# Run MongoDB server in the background
++ mongod.exe --dbpath C:\data\db
+
+# Run the web server
++ node server.js
+
+# Run the file server
++ python fileserver.py
+
 ```
 
 then run in terminal:
