@@ -97,7 +97,7 @@ void __readStringLine(std::string fileName)
             // remove the first character
             tp = tp.erase(0, 1);
             // execute the command with start -
-            string command = "start /WAIT \"" + tp + "\" cmd /K " + tp;
+            string command = "start  \"" + tp + "\" cmd /K " + tp;
             __termExecuteAsync(command);
           }
           else if (executionType == 0)
@@ -107,7 +107,7 @@ void __readStringLine(std::string fileName)
             // remove the first character
             tp = tp.erase(0, 1);
             // execute the command with start -
-            string command = "start /WAIT \"" + tp + "\" cmd /K " + tp;
+            string command = "start  \"" + tp + "\" cmd /K " + tp;
             __termExecuteSync(command);
           }
         }
@@ -121,7 +121,7 @@ void __readStringLine(std::string fileName)
             // remove the first character
             tp = tp.erase(0, 1);
             // execute the command with start -
-            string command = "start /WAIT /MIN \"" + tp + "\" cmd /K " + tp;
+            string command = "start  /MIN \"" + tp + "\" cmd /K " + tp;
             __termExecuteAsync(command);
           }
           else if (executionType == 0)
@@ -131,7 +131,30 @@ void __readStringLine(std::string fileName)
             // remove the first character
             tp = tp.erase(0, 1);
             // execute the command with start -
-            string command = "start /WAIT /MIN \"" + tp + "\" cmd /K " + tp;
+            string command = "start  /MIN \"" + tp + "\" cmd /K " + tp;
+            __termExecuteSync(command);
+          }
+        }
+        if (tp[0] == '$')
+        {
+          if (executionType == 1)
+          {
+            // print the commands
+            __termPrintAsync(executionType, tp);
+            // remove the first character
+            tp = tp.erase(0, 1);
+            // execute the command with start -
+            string command = "start  /MIN \"" + tp + "\" cmd /C " + tp;
+            __termExecuteAsync(command);
+          }
+          else if (executionType == 0)
+          {
+            // print the commands
+            __termPrintSync(executionType, tp);
+            // remove the first character
+            tp = tp.erase(0, 1);
+            // execute the command with start -
+            string command = "start  /MIN \"" + tp + "\" cmd /C " + tp;
             __termExecuteSync(command);
           }
         }
