@@ -8,7 +8,6 @@
 #include <mutex>
 #include <string>
 #include <thread>
-#include <unistd.h>
 #include <vector>
 
 // user functions
@@ -171,8 +170,7 @@ void __readStringLine(std::string fileName)
   }
 }
 
-void autoRunner(void)
+void autoRunner(string sourcefile)
 {
-  string sourcefile = ".autofile";
   __readStringLine(sourcefile);
 }

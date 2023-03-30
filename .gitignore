@@ -1,3 +1,6 @@
 **.exe**
-bin
 .zip
+*.exe
+*.autofile
+/bin
+.vscode

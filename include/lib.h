@@ -6,15 +6,15 @@
 
 // namespaces functions
 using std::cout;
-using std::string;
 using std::endl;
+using std::string;
 
-
-extern "C"{
+extern "C"
+{
 #endif
-	void autoRunner(void);
+	void autoRunner(string sourcefile);
 
 #ifdef __cplusplus
 }
 #endif
-#endif 
+#endif
