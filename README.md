@@ -13,9 +13,11 @@ How to use:
 Create a file .autofile then add commands like below in the .autofile:
 ```cmd
 # This is a comment
+# Run taskkill single use command
+$ taskill /im node.exe
 
 # Run MongoDB server in the background
-+ mongod.exe --dbpath C:\data\db
+- mongod.exe --dbpath C:\data\db
 
 # Run the web server
 + node server.js
