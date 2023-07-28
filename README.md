@@ -1,10 +1,10 @@
- # AutoCLI
+ # Auto
 <p align="center">
   <img width="200" height="200" src="https://github.com/marcuwynu23/Auto/blob/main/docs/images/1.jpg" />
    <img width="200" height="200" src="https://github.com/marcuwynu23/Auto/blob/main/docs/images/2.jpg" />
 </p>
 
-AutoCLI is a user-friendly command-line automation tool for Windows users. It allows you to create scripts that automate repetitive tasks by executing one or multiple commands in a new terminal instance. The tool is easy to use and supports a wide range of executable commands, which can be customized to fit your specific needs and making it easy to automate tasks on a recurring basis. Overall, AutoCLI is a great tool for anyone who wants to streamline their command-line workflows and save time on repetitive tasks.
+AUTO stand for ( Automate yoUr Terminal Operation ) is a user-friendly command-line automation tool for Windows users. It allows you to create scripts that automate repetitive tasks by executing one or multiple commands in a new terminal instance. The tool is easy to use and supports a wide range of executable commands, which can be customized to fit your specific needs and making it easy to automate tasks on a recurring basis. Overall, AutoCLI is a great tool for anyone who wants to streamline their command-line workflows and save time on repetitive tasks.
 
 
 How to use:
