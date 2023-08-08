@@ -4,9 +4,7 @@
    <img width="200" height="200" src="https://github.com/marcuwynu23/Auto/blob/main/docs/images/2.jpg" />
 </p>
 
-AUTO stand for ( Automate yoUr Terminal Operation ) is a user-friendly command-line automation tool for Windows users. It allows you to create scripts that automate repetitive tasks by executing one or multiple commands in a new terminal instance. The tool is easy to use and supports a wide range of executable commands, which can be customized to fit your specific needs and making it easy to automate tasks on a recurring basis. Overall, AutoCLI is a great tool for anyone who wants to streamline their command-line workflows and save time on repetitive tasks.
-
-
+AUTO (Automate YoUr Terminal Operation) is a powerful command-line tool designed to streamline your workflow by automating the execution of commands in separate instances of the terminal. With AUTO, you can easily define scripts containing sequences of commands, and the tool will run each command in its own terminal instance.
 How to use:
 
 Create a file .autofile then add commands like below in the .autofile:
