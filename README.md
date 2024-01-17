@@ -36,7 +36,7 @@ specially if the a specify command can only run in ONE INSTANCE.
 
 <!-- CONTRIBUTING -->
 ## Contributing
-# Contributing to Ao
+# Contributing to Auto
 
 We welcome contributions to the AutoCLI project! To get started, simply follow these steps:
 
