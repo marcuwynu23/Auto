@@ -16,11 +16,20 @@ $ taskill /im node.exe
 # Run MongoDB server in the background
 - mongod.exe --dbpath C:\data\db
 
-# Run the web server
+# Run the web server normally
 + node server.js
-
 # Run the file server
 + python fileserver.py
+
+
+# excute many command in same line
++ set PORT=4000 && npm start --prefix client
+
+# run attendance frontend server
++ npm start --prefix attendance
+
+# run hris backend server
++ npm run --prefix server dev
 
 ```
 
