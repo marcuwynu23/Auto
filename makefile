@@ -1,33 +1,23 @@
-# constants variable
+#constants variable
 BIN=bin/auto.exe
-
-
 # icon resource 
 ICO=resources/icon.rc
 RES=resources/resource.res
-
-# source files
 SRC=$(wildcard src/*.cpp)
 
-# compiling source files
+# compiling source file
 all: compile_icon compile_source
-
 # running executable
-run: $(BIN)
+run:
 	$(BIN)
+	
+compile_source:
+	c++ -std=c++11 $(RES) -o $(BIN)  -I include $(SRC) 
 
-# compiling source files
-compile_source: $(BIN)
+compile_icon:
+	windres $(ICO) -O coff -o $(RES)
 
-$(BIN): $(SRC)
-	c++ $(CXXFLAGS) $(LDFLAGS) $(RES) -o $@ $^
-
-# compiling icon resource
-compile_icon: $(RES)
-
-$(RES): $(ICO)
-	windres $^ -O coff -o $@
 
 # cleaning executable
 clean:
-	del $(BIN) $(RES)
+	del $(BIN)

@@ -96,7 +96,7 @@ void __readStringLine(std::string fileName)
             // remove the first character
             tp = tp.erase(0, 1);
             // execute the command with start -
-            string command = "start  \"" + tp + "\" cmd /K " + tp;
+            string command = "start  \"" + tp + "\" cmd /K " + "\" " + tp + "\"";
             __termExecuteAsync(command);
           }
           else if (executionType == 0)
@@ -106,7 +106,7 @@ void __readStringLine(std::string fileName)
             // remove the first character
             tp = tp.erase(0, 1);
             // execute the command with start -
-            string command = "start  \"" + tp + "\" cmd /K " + tp;
+            string command = "start  \"" + tp + "\" cmd /K " + "\" " + tp + "\"";
             __termExecuteSync(command);
           }
         }
@@ -120,7 +120,7 @@ void __readStringLine(std::string fileName)
             // remove the first character
             tp = tp.erase(0, 1);
             // execute the command with start -
-            string command = "start  /MIN \"" + tp + "\" cmd /K " + tp;
+            string command = "start  /MIN \"" + tp + "\" cmd /K " + "\" " + tp + "\"";
             __termExecuteAsync(command);
           }
           else if (executionType == 0)
@@ -130,7 +130,7 @@ void __readStringLine(std::string fileName)
             // remove the first character
             tp = tp.erase(0, 1);
             // execute the command with start -
-            string command = "start  /MIN \"" + tp + "\" cmd /K " + tp;
+            string command = "start  /MIN \"" + tp + "\" cmd /K " + "\" " + tp + "\"";
             __termExecuteSync(command);
           }
         }
@@ -143,7 +143,7 @@ void __readStringLine(std::string fileName)
             // remove the first character
             tp = tp.erase(0, 1);
             // execute the command with start -
-            string command = "start  /MIN \"" + tp + "\" cmd /C " + tp;
+            string command = "start  /B \"" + tp + "\" cmd /C " + "\" " + tp + "\"";
             __termExecuteAsync(command);
           }
           else if (executionType == 0)
@@ -153,7 +153,7 @@ void __readStringLine(std::string fileName)
             // remove the first character
             tp = tp.erase(0, 1);
             // execute the command with start -
-            string command = "start  /MIN \"" + tp + "\" cmd /C " + tp;
+            string command = "start  /B \"" + tp + "\" cmd /C " + "\" " + tp + "\"";
             __termExecuteSync(command);
           }
         }
@@ -167,6 +167,9 @@ void __readStringLine(std::string fileName)
     }
     cout << "\n End:\n " << endl;
     newfile.close();
+
+    // clear screen
+    system("cls");
   }
 }
 
