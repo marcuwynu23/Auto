@@ -4,6 +4,7 @@
    <img width="200" height="200" src="https://github.com/marcuwynu23/Auto/blob/main/docs/images/2.jpg" />
 </p>
 
+https://drive.google.com/file/d/1lSIMep5Q1Vhi9r4eZvFDy8SkWOhaCr97/view?usp=drive_link
 AUTO (Automate YoUr Terminal Operation) is a powerful command-line tool designed to streamline your workflow by automating the execution of commands in separate instances of the terminal. With AUTO, you can easily define scripts containing sequences of commands, and the tool will run each command in its own terminal instance.
 How to use:
 
