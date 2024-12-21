@@ -1,5 +1,8 @@
 ::ASYNC
 
+.init{
+  + echo "Hello Initial"
+}
 dev {
  + echo Hello World > test.txt && cat test.txt
 }

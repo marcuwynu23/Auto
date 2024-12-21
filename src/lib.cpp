@@ -129,8 +129,8 @@ void __processBlocks(std::string fileName, std::string targetBlock)
         currentBlock = line.substr(0, line.length() - 2); // Extract block name (before '{')
         std::cout << "Found block: " << currentBlock << std::endl;
 
-        // Check if this is the target block
-        if (currentBlock == targetBlock)
+        // Check if this is the target block or if the block starts with "."
+        if (currentBlock == targetBlock || currentBlock.front() == '.')
         {
           blockFound = true; // Set the flag if the block matches the target
         }
@@ -140,9 +140,9 @@ void __processBlocks(std::string fileName, std::string targetBlock)
         // End of current block
         currentBlock = "";
       }
-      else if (!currentBlock.empty() && currentBlock == targetBlock)
+      else if (!currentBlock.empty() && (currentBlock == targetBlock || currentBlock.front() == '.'))
       {
-        // If we are in the target block, process commands
+        // If we are in the target block or a special block starting with a dot (".")
         if (line[0] == '+')
         {
           // Process commands within a block
