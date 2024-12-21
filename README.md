@@ -10,26 +10,29 @@ How to use:
 Create a file .autofile then add commands like below in the .autofile:
 ```cmd
 # This is a comment
-# Run taskkill single use command
-$ taskill /im node.exe
+# Define the dev block
+dev {
+  # Run taskkill single use command
+  $ taskkill /im node.exe
+  
+  # Run MongoDB server in the background
+  - mongod.exe --dbpath C:\data\db
 
-# Run MongoDB server in the background
-- mongod.exe --dbpath C:\data\db
+  # Run the web server normally
+  + node server.js
 
-# Run the web server normally
-+ node server.js
-# Run the file server
-+ python fileserver.py
+  # Run the file server
+  + python fileserver.py
 
+  # Execute many commands in the same line
+  + set PORT=4000 && npm start --prefix client
 
-# excute many command in same line
-+ set PORT=4000 && npm start --prefix client
+  # Run attendance frontend server
+  + npm start --prefix attendance
 
-# run attendance frontend server
-+ npm start --prefix attendance
-
-# run hris backend server
-+ npm run --prefix server dev
+  # Run hris backend server
+  + npm run --prefix server dev
+}
 
 ```
 
