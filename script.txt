@@ -1,0 +1,8 @@
+::SYNC
+
+dev {
+  - echo "Hello world"
+}
+publish {
+  + echo Hello
+}

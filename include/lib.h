@@ -12,8 +12,7 @@ using std::string;
 extern "C"
 {
 #endif
-	void autoRunner(string sourcefile);
-
+	void autoRunner(string sourceFile, string targetBlock);
 #ifdef __cplusplus
 }
 #endif

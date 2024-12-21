@@ -1,6 +1,13 @@
 ::ASYNC
-####################### This is a comment ############################ 
-+ echo Hello World > test.txt && cat test.txt
-######################################################################
 
+dev {
+ + echo Hello World > test.txt && cat test.txt
+}
 
+dev2 {
+ + echo Hello World1 > test1.txt && cat test1.txt
+}
+
+test {
+  + echo "Hello test"
+}
