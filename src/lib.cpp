@@ -111,9 +111,6 @@ void __processBlocks(std::string fileName, std::string targetBlock)
   if (newfile.is_open())
   {
     std::string line;
-    std::cout << "Autofile: " << std::endl;
-    std::cout << "Start:\n"
-              << std::endl;
 
     while (std::getline(newfile, line))
     {
@@ -127,7 +124,6 @@ void __processBlocks(std::string fileName, std::string targetBlock)
       if (line.back() == '{')
       {
         currentBlock = line.substr(0, line.length() - 2); // Extract block name (before '{')
-        std::cout << "Found block: " << currentBlock << std::endl;
 
         // Check if this is the target block or if the block starts with "."
         if (currentBlock == targetBlock || currentBlock.front() == '.')
