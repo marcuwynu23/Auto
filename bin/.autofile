@@ -4,11 +4,11 @@
   + echo "Hello Initial"
 }
 dev {
- + echo Hello World > test.txt && cat test.txt
+  + echo Hello World > test.txt && cat test.txt
 }
 
 dev2 {
- + echo Hello World1 > test1.txt && cat test1.txt
+  + echo Hello World1 > test1.txt && cat test1.txt
 }
 
 test {

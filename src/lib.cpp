@@ -138,6 +138,12 @@ void __processBlocks(std::string fileName, std::string targetBlock)
       }
       else if (!currentBlock.empty() && (currentBlock == targetBlock || currentBlock.front() == '.'))
       {
+        // Replace tabs with spaces if "tab" keyword is found in the block
+        if (line.find("tab") != std::string::npos)
+        {
+          line = std::regex_replace(line, std::regex("\\t"), "    ");
+        }
+
         // If we are in the target block or a special block starting with a dot (".")
         if (line[0] == '+')
         {
