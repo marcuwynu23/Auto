@@ -1,7 +1,7 @@
 # Constants
-BIN=bin/rust/auto.exe
+BIN=bin/devtask.exe
 SRC=$(wildcard rust/*.rs)
-TARGET=rust.exe
+TARGET=devtask.exe
 
 # Default target
 all: build
