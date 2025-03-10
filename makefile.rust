@@ -1,0 +1,20 @@
+# Constants
+BIN=bin/rust/auto.exe
+SRC=$(wildcard rust/*.rs)
+TARGET=rust.exe
+
+# Default target
+all: build
+
+# Build Rust executable
+build:
+	cd rust && cargo build --release
+	mv rust/target/release/$(TARGET) $(BIN)
+
+# Run the compiled executable
+run:
+	$(BIN)
+
+# Clean build files
+clean:
+	cd rust && cargo clean
