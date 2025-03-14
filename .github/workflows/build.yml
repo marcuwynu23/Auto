@@ -1,0 +1,36 @@
+name: Build C++ Executable with MinGW Tools
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up MSYS2 Environment with MinGW
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-toolchain,make
+
+      - name: Build Executable
+        shell: msys2 {0}
+        run: |
+          make all
+
+      - name: Run Executable
+        shell: msys2 {0}
+        run: |
+          make run
+
+      - name: Clean Build Artifacts
+        shell: msys2 {0}
+        run: |
+          make clean
