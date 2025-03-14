@@ -18,7 +18,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           update: true
-          install: mingw-w64-x86_64-toolchain, make
+          install: mingw-w64-x86_64-toolchain,make
 
       - name: Build Executable
         shell: msys2 {0}
