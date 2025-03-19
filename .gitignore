@@ -4,3 +4,6 @@
 *.autofile
 /bin
 .vscode
+
+*/**/*.exe
+target
