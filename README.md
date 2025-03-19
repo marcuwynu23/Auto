@@ -9,18 +9,18 @@
   <img src="https://img.shields.io/github/license/marcuwynu23/Auto.svg" alt="License Badge"/>
 </p>
 
-
 AUTO (Automate YoUr Terminal Operation) is a powerful command-line tool designed to streamline your workflow by automating the execution of commands in separate instances of the terminal. With AUTO, you can easily define scripts containing sequences of commands, and the tool will run each command in its own terminal instance.
 How to use:
 
 Create a file .autofile then add commands like below in the .autofile:
+
 ```cmd
 # This is a comment
 # Define the dev block
 dev {
   # Run taskkill single use command
   $ taskkill /im node.exe
-  
+
   # Run MongoDB server in the background
   - mongod.exe --dbpath C:\data\db
 
@@ -43,17 +43,47 @@ dev {
 ```
 
 then run in terminal:
+
 ```
 auto
 ```
 
+## Build Instructions
+
+### MinGW (Default)
+
+To build using MinGW, simply run:
+
+```sh
+make
+```
+
+### LLVM without CMake only clang++ compiler
+
+If you're using LLVM/Clang without CMake, you'll need a separate Makefile (llvm.makefile). Build using:
+
+```sh
+make -f llvm.makefile
+```
+
+### CMake (Preferred)
+
+If you have CMake installed, you can build Auto using:
+
+```sh
+cmake -B build -G "MinGW Makefiles"
+cmake --build build
+```
+
+<!-- CONTRIBUTING -->
+
 ## NOTE:
+
 Once the commands inside the .autofile is already RUNNING no need to rerun again the auto command sometimes it can cause error to the commands execution
 specially if the a specify command can only run in ONE INSTANCE.
 
-
-<!-- CONTRIBUTING -->
 ## Contributing
+
 # Contributing to Auto
 
 We welcome contributions to the AutoCLI project! To get started, simply follow these steps:
@@ -65,4 +95,3 @@ We welcome contributions to the AutoCLI project! To get started, simply follow t
 5. Open a pull request to the main project repository
 
 Our team will review your changes and merge them if they meet our standards. By contributing to AutoCLI, you'll be helping to make the tool even better for everyone who uses it. Thank you in advance for your contributions, and happy coding!
-
