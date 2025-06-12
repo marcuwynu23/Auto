@@ -1,1 +1,3 @@
-id ICON "auto.ico"
+#include <windows.h>
+
+IDI_ICON1 ICON "auto.ico"

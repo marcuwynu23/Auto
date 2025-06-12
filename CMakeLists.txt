@@ -1,48 +1,41 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.16...3.29)
 project(AutoProject LANGUAGES CXX)
 
-# Set C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Use Clang for compilation
 if(MSVC)
-    message(FATAL_ERROR "This project is intended for Clang/MinGW")
+    message(FATAL_ERROR "This project is intended for Clang/LLVM.")
 else()
     set(CMAKE_CXX_COMPILER clang++)
-    set(CMAKE_RC_COMPILER windres) # Resource compiler
+    set(CMAKE_RC_COMPILER llvm-rc)
 endif()
 
-# Source files
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
 file(GLOB SRC "src/*.cpp")
-file(GLOB SRC_TEST "test/*.cpp")
-set(RESOURCES resources/resource.res)
-
-# Include directories
 include_directories(include)
-
-# Output binary directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Main executable
-add_executable(auto ${SRC} ${RESOURCES})
-target_compile_options(auto PRIVATE -Wall -Wextra -Wpedantic)
-
-# Icon compilation (Windows)
 if(WIN32)
+    set(RC_FILE "${CMAKE_SOURCE_DIR}/resources/icon.rc")
+    set(RES_FILE "${CMAKE_BINARY_DIR}/icon.res")
+
     add_custom_command(
-        OUTPUT ${RESOURCES}
-        COMMAND ${CMAKE_RC_COMPILER} resources/icon.rc -O coff -o ${RESOURCES}
-        DEPENDS resources/icon.rc
+        OUTPUT "${RES_FILE}"
+        COMMAND ${CMAKE_RC_COMPILER} /FO "${RES_FILE}" "${RC_FILE}"
+        DEPENDS "${RC_FILE}" "${CMAKE_SOURCE_DIR}/resources/auto.ico"
+        COMMENT "Compiling icon resource file"
+        VERBATIM
     )
+
+
+    add_executable(auto ${SRC} ${RES_FILE})
+    target_link_libraries(auto PRIVATE Shlwapi)
+else()
+    add_executable(auto ${SRC})
 endif()
 
-# Experimental test executable
-add_executable(test_experimental ${SRC_TEST})
-target_compile_options(test_experimental PRIVATE -Wall -Wextra -Wpedantic)
-
-# Clean target
-add_custom_target(clean-all
-    COMMAND ${CMAKE_COMMAND} -E rm -rf ${CMAKE_BINARY_DIR}/bin
-    COMMAND ${CMAKE_COMMAND} -E rm -rf CMakeFiles CMakeCache.txt
-)
+target_compile_options(auto PRIVATE -Wall -Wextra -Wpedantic)
