@@ -57,7 +57,14 @@ jobs:
       - name: Build Tests
         shell: pwsh
         run: |
-          make -f llvm.makefile test
+          # Clean any existing test executable to force rebuild
+          if (Test-Path "test.exe") {
+            Remove-Item "test.exe" -Force
+            echo "Removed existing test.exe"
+          }
+          
+          # Force rebuild of tests (using -B flag before target)
+          make -B -f llvm.makefile test
           
           # Verify test executable was created
           if (Test-Path "test.exe") {

@@ -27,8 +27,11 @@ compile_source: $(SRC)
 compile_icon: $(ICO)
 	$(RC) $(ICO) -O coff -o $(RES)
 
+# Mark test as phony to always rebuild
+.PHONY: test
+
 # Compile test files
-test: $(SRC_TEST)
+test: $(SRC_TEST) $(SRC_LIB)
 	$(CXX) $(CXXFLAGS) -o test.exe $(INCLUDE) $(SRC_TEST) $(SRC_LIB)
 	@echo "Test executable created: test.exe"
 
