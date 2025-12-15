@@ -1,31 +1,74 @@
 <div align="center">
-  <h1> Auto </h1>
+
+# 🚀 Auto
+
+**Automate YoUr Terminal Operation**
+
+A powerful command-line tool designed to streamline your workflow by automating the execution of commands in separate terminal instances.
+
+[![GitHub stars](https://img.shields.io/github/stars/marcuwynu23/Auto.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/marcuwynu23/Auto/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/marcuwynu23/Auto.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/marcuwynu23/Auto/network)
+[![GitHub issues](https://img.shields.io/github/issues/marcuwynu23/Auto.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/marcuwynu23/Auto/issues)
+[![GitHub license](https://img.shields.io/github/license/marcuwynu23/Auto.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/marcuwynu23/Auto/blob/main/LICENSE)
+
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Building](#-building) • [Contributing](#-contributing)
+
 </div>
 
-<p align="center">
-  <img src="https://img.shields.io/github/stars/marcuwynu23/Auto.svg" alt="Stars Badge"/>
-  <img src="https://img.shields.io/github/forks/marcuwynu23/Auto.svg" alt="Forks Badge"/>
-  <img src="https://img.shields.io/github/issues/marcuwynu23/Auto.svg" alt="Issues Badge"/>
-  <img src="https://img.shields.io/github/license/marcuwynu23/Auto.svg" alt="License Badge"/>
-</p>
+---
 
-AUTO (Automate YoUr Terminal Operation) is a powerful command-line tool designed to streamline your workflow by automating the execution of commands in separate instances of the terminal. With AUTO, you can easily define scripts containing sequences of commands, and the tool will run each command in its own terminal instance.
+## 📋 Table of Contents
 
-Create a file .autofile then add commands like below in the .autofile:
-## How to Use
+- [Features](#-features)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Command Syntax](#-command-syntax)
+- [Building](#-building)
+- [Important Notes](#-important-notes)
+- [Contributing](#-contributing)
+
+---
+
+## ✨ Features
+
+- 🎯 **Block-based Configuration** - Organize commands into named blocks for easy management
+- 🖥️ **Separate Terminal Instances** - Each command runs in its own terminal window
+- ⚡ **Multiple Execution Modes** - Normal, minimized, and background execution
+- 🔄 **Background Processes** - Run commands in the background without blocking
+- 📝 **Comment Support** - Add comments to document your automation scripts
+- 🎨 **Simple Syntax** - Easy-to-read and write configuration format
+
+---
+
+## 📦 Installation
+
+### Option 1: Download Pre-built Binary
+
+1. Go to the [Releases](https://github.com/marcuwynu23/Auto/releases) page
+2. Download the latest `auto.exe` or `AutoInstaller.*.exe`
+3. For installer: Run the installer and follow the setup wizard
+4. For standalone: Add `auto.exe` to your system PATH
+
+### Option 2: Build from Source
+
+See the [Building](#-building) section below.
+
+---
+
+## 🚀 Usage
 
 ### Step 1: Create a `.autofile`
 
-Create a file named `.autofile` and add commands as shown below:
+Create a file named `.autofile` in your project directory and define your command blocks:
 
 ```cmd
 # This is a comment
 # Define the dev block
 dev {
-  # Run taskkill single-use command
+  # Run taskkill single-use command (background)
   $ taskkill /im node.exe
 
-  # Run MongoDB server in the background
+  # Run MongoDB server in minimized window
   - mongod.exe --dbpath C:\data\db
 
   # Run the web server normally
@@ -45,98 +88,164 @@ dev {
 }
 ```
 
-then run in terminal:
+### Step 2: Run Auto
 
+Execute the following command in your terminal:
+
+```sh
+auto dev
 ```
-auto
+
+Or if using a custom file:
+
+```sh
+auto -f .autofile dev
 ```
 
-## Build Instructions
+---
 
-### MinGW (Default)
+## 📖 Command Syntax
 
-To build using MinGW, simply run:
+Auto supports three execution modes:
+
+| Symbol | Mode       | Description                                 |
+| ------ | ---------- | ------------------------------------------- |
+| `+`    | Normal     | Runs command in a normal terminal window    |
+| `-`    | Minimized  | Runs command in a minimized terminal window |
+| `$`    | Background | Runs command in the background (no window)  |
+
+### Example Configuration
+
+```cmd
+production {
+  # Start services in background
+  $ nginx.exe
+  $ redis-server.exe
+
+  # Start main application normally
+  + node app.js
+
+  # Start monitoring in minimized window
+  - pm2 monit
+}
+```
+
+### Special Blocks
+
+Blocks starting with `.` (dot) are special blocks that can be executed automatically:
+
+```cmd
+.init {
+  # This block runs automatically
+  + echo "Initializing environment..."
+  + npm install
+}
+```
+
+---
+
+## 🔨 Building
+
+### Prerequisites
+
+- **C++ Compiler**: MinGW-w64, LLVM/Clang, or MSVC
+- **Windows Resource Compiler**: `windres` (included with MinGW)
+- **Make**: For using the Makefile (optional)
+
+### Build Methods
+
+#### Method 1: Using Make (MinGW - Default)
 
 ```sh
 make
 ```
 
-### LLVM without CMake only clang++ compiler
+The compiled binary will be in the `bin/` directory.
 
-If you're using LLVM/Clang without CMake, you'll need a separate Makefile (llvm.makefile). Build using:
+#### Method 2: Using Make (LLVM/Clang)
 
 ```sh
 make -f llvm.makefile
 ```
 
-### CMake (Preferred)
-
-If you have CMake installed, you can build Auto using:
+#### Method 3: Using CMake (Preferred)
 
 ```sh
 cmake -B build -G "MinGW Makefiles"
 cmake --build build
 ```
 
-<!-- CONTRIBUTING -->
-
-## NOTE:
-
-Once the commands inside the .autofile is already RUNNING no need to rerun again the auto command sometimes it can cause error to the commands execution
-specially if the a specify command can only run in ONE INSTANCE.
-
-## Contributing
-
-# Contributing to Auto
-### Step 2: Run the `auto` command
-
-Once your `.autofile` is ready, execute the following command in the terminal:
-
-```sh
-auto
-```
-
-## 📌 Note:
-
-- **Do not rerun** the `auto` command while processes inside the `.autofile` are already running. Doing so may cause errors, especially if a specific command only supports **one running instance** at a time.
-
----
-
-## 🚀 Building the Project
-
-### **For C++ Version**
-
-Our team will review your changes and merge them if they meet our standards. By contributing to AutoCLI, you'll be helping to make the tool even better for everyone who uses it. Thank you in advance for your contributions, and happy coding!
-```sh
-make
-```
-
-- This will compile the C++ version of the project using the `Makefile`.
-- The compiled binary can be found inside the `bin/` directory.
-
-### **For Rust Version**
+#### Method 4: Rust Version (Alternative)
 
 ```sh
 make -f makefile.rust
 ```
 
-- This will compile the Rust version of the project using `Cargo`.
-- The compiled binary will be placed inside `bin/rust/auto`.
+The compiled binary will be in `bin/rust/auto`.
 
 ---
 
-## 🛠 Contributing
+## ⚠️ Important Notes
 
-### **Contributing to Auto**
+### ⚡ Running Processes
 
-We welcome contributions to the AutoCLI project! To get started, follow these steps:
+- **Do not rerun** the `auto` command while processes inside the `.autofile` are already running
+- Doing so may cause errors, especially if a specific command only supports **one running instance** at a time
+- Always stop existing processes before running `auto` again
 
-1. **Fork** the project to your own GitHub account.
-2. **Create a new branch** for your changes.
-3. **Commit your changes** to your new branch.
-4. **Push your branch** to your forked repository.
-5. **Open a pull request** to the main project repository.
+### 💡 Best Practices
 
-Our team will review your changes and merge them if they meet our standards. By contributing to AutoCLI, you'll be helping make the tool even better for everyone who uses it.
+- Use descriptive block names (e.g., `dev`, `production`, `test`)
+- Add comments to document your automation scripts
+- Group related commands in the same block
+- Use background mode (`$`) for services that don't need user interaction
+- Use minimized mode (`-`) for monitoring tools
 
-Thank you in advance for your contributions, and happy coding! 🚀
+---
+
+## 🤝 Contributing
+
+We welcome contributions to Auto! Here's how you can help:
+
+### Getting Started
+
+1. **Fork** the repository to your GitHub account
+2. **Clone** your fork locally:
+   ```sh
+   git clone https://github.com/your-username/Auto.git
+   cd Auto
+   ```
+3. **Create a new branch** for your changes:
+   ```sh
+   git checkout -b feature/your-feature-name
+   ```
+4. **Make your changes** and test them thoroughly
+5. **Commit** your changes:
+   ```sh
+   git commit -m "Add: your feature description"
+   ```
+6. **Push** to your fork:
+   ```sh
+   git push origin feature/your-feature-name
+   ```
+7. **Open a Pull Request** on the main repository
+
+### Contribution Guidelines
+
+- Follow the existing code style
+- Add comments for complex logic
+- Test your changes before submitting
+- Update documentation if needed
+- Write clear commit messages
+
+Our team will review your changes and merge them if they meet our standards. Thank you for helping make Auto better! 🎉
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [Mark Wayne Menorca](https://github.com/marcuwynu23)**
+
+[⭐ Star this repo](https://github.com/marcuwynu23/Auto) • [🐛 Report Bug](https://github.com/marcuwynu23/Auto/issues) • [💡 Request Feature](https://github.com/marcuwynu23/Auto/issues)
+
+</div>

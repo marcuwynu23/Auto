@@ -2,7 +2,7 @@
 .zip
 *.exe
 *.autofile
-/bin
+bin/
 .vscode
 
 */**/*.exe
