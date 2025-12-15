@@ -1,0 +1,100 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install LLVM
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "latest"
+          cached: true
+
+      - name: Install MinGW-w64 (for windres and make)
+        shell: pwsh
+        run: |
+          # Install MinGW-w64 using Chocolatey
+          choco install mingw -y
+          
+          # Add MinGW to PATH
+          $mingwPath = "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin"
+          if (Test-Path $mingwPath) {
+            echo "$mingwPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            echo "MinGW installed at: $mingwPath"
+          } else {
+            # Try alternative path
+            $mingwPath = "C:\tools\mingw64\bin"
+            if (Test-Path $mingwPath) {
+              echo "$mingwPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            }
+          }
+          
+          # Install make separately if needed
+          choco install make -y
+          
+          # Verify tools
+          windres --version
+          make --version
+
+      - name: Verify Tools
+        shell: pwsh
+        run: |
+          clang++ --version
+          windres --version
+          make --version
+          echo "All tools verified successfully"
+
+      - name: Build Tests
+        shell: pwsh
+        run: |
+          # Clean any existing test executable to force rebuild
+          if (Test-Path "test.exe") {
+            Remove-Item "test.exe" -Force
+            echo "Removed existing test.exe"
+          }
+          
+          # Force rebuild of tests (using -B flag before target)
+          make -B -f llvm.makefile test
+          
+          # Verify test executable was created
+          if (Test-Path "test.exe") {
+            echo "Test executable built successfully"
+            Get-Item "test.exe" | Select-Object Name, Length, LastWriteTime
+          } else {
+            Write-Error "Test build failed - test.exe not found"
+            exit 1
+          }
+
+      - name: Run Tests
+        shell: pwsh
+        env:
+          AUTO_TEST_MODE: "1"
+        run: |
+          make -f llvm.makefile test-run
+          
+          # Check exit code
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Tests failed with exit code $LASTEXITCODE"
+            exit 1
+          } else {
+            echo "All tests passed successfully!"
+          }
+
+      - name: Clean Test Artifacts
+        shell: pwsh
+        run: |
+          if (Test-Path "test.exe") {
+            Remove-Item "test.exe"
+            echo "Test artifacts cleaned"
+          }
+

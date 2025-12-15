@@ -12,8 +12,11 @@ on:
         type: string
 
 jobs:
-  build:
+  setup:
     runs-on: windows-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      version_number: ${{ steps.version.outputs.version_number }}
     
     steps:
       - name: Checkout code
@@ -28,14 +31,19 @@ jobs:
           } else { 
             ${{ github.event.inputs.version }}
           }
-          echo "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          $versionNumber = $version -replace '^v', ''
           echo "version=$version" >> $env:GITHUB_OUTPUT
+          echo "version_number=$versionNumber" >> $env:GITHUB_OUTPUT
           echo "Version: $version"
+          echo "Version Number: $versionNumber"
 
-      - name: Install Inno Setup
-        uses: ammaraskar/setup-inno-setup@v1.2.0
-        with:
-          version: '6.2.2'
+  build:
+    runs-on: windows-latest
+    needs: setup
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Install LLVM
         uses: KyleMayes/install-llvm-action@v2
@@ -44,11 +52,30 @@ jobs:
           cached: true
 
       - name: Install MinGW-w64 (for windres and make)
-        uses: egor-tensin/setup-mingw@v2
-        with:
-          platform: x64
-          version: latest
-          components: mingw-w64-x86_64-binutils, mingw-w64-x86_64-make
+        shell: pwsh
+        run: |
+          # Install MinGW-w64 using Chocolatey
+          choco install mingw -y
+          
+          # Add MinGW to PATH
+          $mingwPath = "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin"
+          if (Test-Path $mingwPath) {
+            echo "$mingwPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            echo "MinGW installed at: $mingwPath"
+          } else {
+            # Try alternative path
+            $mingwPath = "C:\tools\mingw64\bin"
+            if (Test-Path $mingwPath) {
+              echo "$mingwPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            }
+          }
+          
+          # Install make separately if needed
+          choco install make -y
+          
+          # Verify tools
+          windres --version
+          make --version
 
       - name: Verify Tools
         shell: pwsh
@@ -73,11 +100,52 @@ jobs:
             exit 1
           }
 
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-executable
+          path: bin/auto.exe
+          retention-days: 1
+
+  package:
+    runs-on: windows-latest
+    needs: [setup, build]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download executable artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: auto-executable
+          path: bin/
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          # Install Inno Setup using Chocolatey
+          choco install innosetup -y
+          
+          # Verify installation
+          $isccPath = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $isccPath)) {
+            $isccPath = "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+          }
+          
+          if (Test-Path $isccPath) {
+            echo "Inno Setup installed successfully at: $isccPath"
+            & $isccPath /?
+          } else {
+            Write-Error "Inno Setup installation failed"
+            exit 1
+          }
+
       - name: Update installer script version
         shell: pwsh
         run: |
-          $version = $env:VERSION
-          $versionNumber = $version -replace '^v', ''
+          $version = "${{ needs.setup.outputs.version }}"
+          $versionNumber = "${{ needs.setup.outputs.version_number }}"
           $content = Get-Content "installer-script/Auto.iss" -Raw
           
           # Update version in OutputBaseFilename
@@ -151,16 +219,49 @@ jobs:
             exit 1
           }
 
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: release-artifacts/*
+          retention-days: 1
+
+  release:
+    runs-on: windows-latest
+    needs: [setup, package]
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: release-artifacts/
+
+      - name: Get installer filename
+        id: installer
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem -Path "release-artifacts" -Filter "AutoInstaller.*.exe" | Select-Object -First 1
+          if ($installer) {
+            echo "name=$($installer.Name)" >> $env:GITHUB_OUTPUT
+            echo "path=release-artifacts/$($installer.Name)" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Error "Installer file not found"
+            exit 1
+          }
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             release-artifacts/auto.exe
             ${{ steps.installer.outputs.path }}
-          tag_name: ${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version }}
+          tag_name: ${{ needs.setup.outputs.version }}
+          name: Release ${{ needs.setup.outputs.version }}
           body: |
-            ## Release ${{ steps.version.outputs.version }}
+            ## Release ${{ needs.setup.outputs.version }}
             
             ### Downloads
             - **auto.exe** - Standalone executable
@@ -173,4 +274,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

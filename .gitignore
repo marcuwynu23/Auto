@@ -9,3 +9,5 @@ bin/
 target
 
 build/
+
+.test_autofile_*
