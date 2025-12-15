@@ -37,38 +37,33 @@ jobs:
         with:
           version: '6.2.2'
 
-      - name: Setup MinGW-w64
+      - name: Setup LLVM
+        uses: egor-tensin/setup-llvm@v1
+        with:
+          version: latest
+          platform: x64
+          components: clang, lld
+
+      - name: Install MinGW-w64 (for windres and make)
         uses: egor-tensin/setup-mingw@v2
         with:
           platform: x64
           version: latest
-          components: mingw-w64-x86_64-gcc, mingw-w64-x86_64-binutils
+          components: mingw-w64-x86_64-binutils, mingw-w64-x86_64-make
+
+      - name: Verify Tools
+        shell: pwsh
+        run: |
+          clang++ --version
+          windres --version
+          make --version
+          echo "All tools verified successfully"
 
       - name: Build executable
         shell: pwsh
         run: |
-          # Create bin directory if it doesn't exist
-          if (-not (Test-Path "bin")) {
-            New-Item -ItemType Directory -Path "bin" | Out-Null
-          }
-          
-          # Compile icon resource
-          $windres = "${env:MINGW64}\bin\windres.exe"
-          if (Test-Path $windres) {
-            & $windres resources/icon.rc -O coff -o resources/resource.res
-          } else {
-            # Fallback to system windres
-            windres resources/icon.rc -O coff -o resources/resource.res
-          }
-          
-          # Compile source files
-          $gpp = "${env:MINGW64}\bin\g++.exe"
-          if (Test-Path $gpp) {
-            & $gpp -std=c++11 resources/resource.res -o bin/auto.exe -I include src/*.cpp
-          } else {
-            # Fallback to system compiler
-            c++ -std=c++11 resources/resource.res -o bin/auto.exe -I include src/*.cpp
-          }
+          # Build using llvm.makefile
+          make -f llvm.makefile all
           
           # Verify executable was created
           if (Test-Path "bin/auto.exe") {

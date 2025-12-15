@@ -1,4 +1,4 @@
-name: Build C++ Executable with MinGW Tools
+name: Build C++ Executable with LLVM
 
 on:
   push:
@@ -12,25 +12,50 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up MSYS2 Environment with MinGW
-        uses: msys2/setup-msys2@v2
+      - name: Setup LLVM
+        uses: egor-tensin/setup-llvm@v1
         with:
-          update: true
-          install: mingw-w64-x86_64-toolchain,make
+          version: latest
+          platform: x64
+          components: clang, lld
+
+      - name: Install MinGW-w64 (for windres and make)
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+          version: latest
+          components: mingw-w64-x86_64-binutils, mingw-w64-x86_64-make
+
+      - name: Verify Tools
+        shell: pwsh
+        run: |
+          clang++ --version
+          windres --version
+          make --version
+          echo "All tools verified successfully"
 
       - name: Build Executable
-        shell: msys2 {0}
+        shell: pwsh
         run: |
-          make all
+          make -f llvm.makefile all
+          
+          # Verify executable was created
+          if (Test-Path "bin/auto.exe") {
+            echo "Build successful!"
+            Get-Item "bin/auto.exe" | Select-Object Name, Length, LastWriteTime
+          } else {
+            Write-Error "Build failed - executable not found"
+            exit 1
+          }
 
       - name: Run Executable
-        shell: msys2 {0}
+        shell: pwsh
         run: |
-          make run
+          make -f llvm.makefile run
 
       - name: Clean Build Artifacts
-        shell: msys2 {0}
+        shell: pwsh
         run: |
-          make clean
+          make -f llvm.makefile clean
