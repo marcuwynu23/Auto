@@ -33,9 +33,24 @@ jobs:
           echo "Version: $version"
 
       - name: Install Inno Setup
-        uses: ammaraskar/setup-inno-setup@v1.2.0
-        with:
-          version: '6.2.2'
+        shell: pwsh
+        run: |
+          # Install Inno Setup using Chocolatey
+          choco install innosetup -y
+          
+          # Verify installation
+          $isccPath = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $isccPath)) {
+            $isccPath = "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+          }
+          
+          if (Test-Path $isccPath) {
+            echo "Inno Setup installed successfully at: $isccPath"
+            & $isccPath /?
+          } else {
+            Write-Error "Inno Setup installation failed"
+            exit 1
+          }
 
       - name: Install LLVM
         uses: KyleMayes/install-llvm-action@v2
