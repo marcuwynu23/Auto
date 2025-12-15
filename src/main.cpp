@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
   {
     targetBlock = argv[1]; // Get the block name
   }
-  else if (argc == 3) // "-f" flag followed by file and block name
+  else if (argc == 4) // "-f" flag followed by file and block name
   {
     std::string flag = argv[1];
 

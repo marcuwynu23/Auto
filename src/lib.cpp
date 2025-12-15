@@ -10,25 +10,34 @@
 #include <thread>
 #include <vector>
 #include <windows.h>
-#include <regex>
 #include <iostream>
+#include <algorithm>
+#include <cctype>
+
+// Static mutex for thread-safe console output
+static std::mutex g_console_mutex;
+
+// Helper function to trim whitespace from both ends of a string
+std::string trim(const std::string& str)
+{
+  size_t first = str.find_first_not_of(" \t\n\r");
+  if (first == std::string::npos)
+    return "";
+  size_t last = str.find_last_not_of(" \t\n\r");
+  return str.substr(first, (last - first + 1));
+}
 
 // Function to execute the commands synchronously
-void __termExecuteSync(std::string command)
+void __termExecuteSync(const std::string& command)
 {
-  std::mutex m;
-  std::thread t{[&]
-                {
-                  std::lock_guard<std::mutex> lock{m};
-                  system(command.c_str());
-                }};
-  t.join();
+  system(command.c_str());
 }
 
 // Function to execute the commands asynchronously
-void __termExecuteAsync(std::string command)
+void __termExecuteAsync(const std::string& command)
 {
-  std::thread t{[&]
+  // Capture by value to avoid use-after-free
+  std::thread t{[command]
                 {
                   system(command.c_str());
                 }};
@@ -36,20 +45,16 @@ void __termExecuteAsync(std::string command)
 }
 
 // Function to print the command in the terminal (synchronously)
-void __termPrintSync(int type, std::string str)
+void __termPrintSync(int type, const std::string& str)
 {
-  std::mutex m;
-  std::thread t{[&]
-                {
-                  std::lock_guard<std::mutex> lock{m};
-                  std::cout << "  type: " << type << " : " << str << std::endl;
-                }};
-  t.join();
+  std::lock_guard<std::mutex> lock{g_console_mutex};
+  std::cout << "  type: " << type << " : " << str << std::endl;
 }
 
 // Function to print the command in the terminal (asynchronously)
-void __termPrintAsync(int type, std::string str)
+void __termPrintAsync(int type, const std::string& str)
 {
+  std::lock_guard<std::mutex> lock{g_console_mutex};
   std::cout << "  type: " << type << " : " << str << std::endl;
 }
 
@@ -99,11 +104,23 @@ std::vector<std::string> splitCommand(const std::string &command)
   return args;
 }
 
-// Function to read and process the script with blocks
-void __processBlocks(std::string fileName, std::string targetBlock)
+// Helper function to replace tabs with spaces
+void replaceTabs(std::string& str)
 {
-  std::fstream newfile;
-  newfile.open(fileName, std::ios::in);
+  for (size_t i = 0; i < str.length(); ++i)
+  {
+    if (str[i] == '\t')
+    {
+      str.replace(i, 1, "    ");
+      i += 3; // Skip the inserted spaces
+    }
+  }
+}
+
+// Function to read and process the script with blocks
+void __processBlocks(const std::string& fileName, const std::string& targetBlock)
+{
+  std::ifstream newfile(fileName);
   int executionType = 0; // Default to SYNC
   std::string currentBlock;
   bool blockFound = false; // Flag to check if the block exists
@@ -115,18 +132,19 @@ void __processBlocks(std::string fileName, std::string targetBlock)
     while (std::getline(newfile, line))
     {
       // Trim leading and trailing whitespaces
-      line = std::regex_replace(line, std::regex("^ +| +$"), "");
+      line = trim(line);
 
       if (line.empty())
         continue;
 
       // Check for block definition (e.g., dev { or publish {)
-      if (line.back() == '{')
+      if (!line.empty() && line.back() == '{')
       {
-        currentBlock = line.substr(0, line.length() - 2); // Extract block name (before '{')
+        // Extract block name (before '{'), trim whitespace
+        currentBlock = trim(line.substr(0, line.length() - 1));
 
         // Check if this is the target block or if the block starts with "."
-        if (currentBlock == targetBlock || currentBlock.front() == '.')
+        if (!currentBlock.empty() && (currentBlock == targetBlock || currentBlock.front() == '.'))
         {
           blockFound = true; // Set the flag if the block matches the target
         }
@@ -134,68 +152,85 @@ void __processBlocks(std::string fileName, std::string targetBlock)
       else if (line == "}")
       {
         // End of current block
-        currentBlock = "";
+        currentBlock.clear();
       }
-      else if (!currentBlock.empty() && (currentBlock == targetBlock || currentBlock.front() == '.'))
+      else if (!currentBlock.empty() && (currentBlock == targetBlock || (!currentBlock.empty() && currentBlock.front() == '.')))
       {
         // Replace tabs with spaces if "tab" keyword is found in the block
         if (line.find("tab") != std::string::npos)
         {
-          line = std::regex_replace(line, std::regex("\\t"), "    ");
+          replaceTabs(line);
         }
+
+        // Check if line has at least one character before accessing
+        if (line.empty())
+          continue;
 
         // If we are in the target block or a special block starting with a dot (".")
         if (line[0] == '+')
         {
           // Process commands within a block
+          std::string cmdLine = line.substr(1);
+          std::vector<std::string> args = splitCommand(cmdLine);
+          
+          // Safety check: ensure args is not empty before accessing args[0]
+          if (args.empty())
+            continue;
+            
           if (executionType == 1) // Async execution
           {
             __termPrintAsync(executionType, line);
-            std::vector<std::string> args = splitCommand(line.substr(1)); // Split the command into arguments
-            std::string command = "start \"" + args[0] + "\" cmd /K \"" + line.substr(1) + "\"";
+            std::string command = "start \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
             __termExecuteAsync(command);
           }
           else // Sync execution
           {
             __termPrintSync(executionType, line);
-            std::vector<std::string> args = splitCommand(line.substr(1)); // Split the command into arguments
-            std::string command = "start \"" + args[0] + "\" cmd /K \"" + line.substr(1) + "\"";
+            std::string command = "start \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
             __termExecuteSync(command);
           }
         }
         else if (line[0] == '-')
         {
           // Handle minimized execution
+          std::string cmdLine = line.substr(1);
+          std::vector<std::string> args = splitCommand(cmdLine);
+          
+          if (args.empty())
+            continue;
+            
           if (executionType == 1) // Async execution
           {
             __termPrintAsync(executionType, line);
-            std::vector<std::string> args = splitCommand(line.substr(1));
-            std::string command = "start /MIN \"" + args[0] + "\" cmd /K \"" + line.substr(1) + "\"";
+            std::string command = "start /MIN \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
             __termExecuteAsync(command);
           }
           else // Sync execution
           {
             __termPrintSync(executionType, line);
-            std::vector<std::string> args = splitCommand(line.substr(1));
-            std::string command = "start /MIN \"" + args[0] + "\" cmd /K \"" + line.substr(1) + "\"";
+            std::string command = "start /MIN \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
             __termExecuteSync(command);
           }
         }
         else if (line[0] == '$')
         {
           // Handle background execution
+          std::string cmdLine = line.substr(1);
+          std::vector<std::string> args = splitCommand(cmdLine);
+          
+          if (args.empty())
+            continue;
+            
           if (executionType == 1) // Async execution
           {
             __termPrintAsync(executionType, line);
-            std::vector<std::string> args = splitCommand(line.substr(1));
-            std::string command = "start /B \"" + args[0] + "\" cmd /C \"" + line.substr(1) + "\"";
+            std::string command = "start /B \"" + args[0] + "\" cmd /C \"" + cmdLine + "\"";
             __termExecuteAsync(command);
           }
           else // Sync execution
           {
             __termPrintSync(executionType, line);
-            std::vector<std::string> args = splitCommand(line.substr(1));
-            std::string command = "start /B \"" + args[0] + "\" cmd /C \"" + line.substr(1) + "\"";
+            std::string command = "start /B \"" + args[0] + "\" cmd /C \"" + cmdLine + "\"";
             __termExecuteSync(command);
           }
         }
@@ -208,9 +243,7 @@ void __processBlocks(std::string fileName, std::string targetBlock)
       std::cout << "Block \"" << targetBlock << "\" not found in the script." << std::endl;
     }
 
-    std::cout << "\nEnd:\n"
-              << std::endl;
-    newfile.close();
+    std::cout << "\nEnd:\n" << std::endl;
   }
   else
   {
@@ -219,7 +252,7 @@ void __processBlocks(std::string fileName, std::string targetBlock)
 }
 
 // Main function to execute the script
-void autoRunner(std::string sourceFile, std::string targetBlock)
+void autoRunner(const std::string& sourceFile, const std::string& targetBlock)
 {
   __processBlocks(sourceFile, targetBlock);
 }
