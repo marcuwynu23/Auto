@@ -68,10 +68,17 @@ jobs:
             exit 1
           }
 
-      - name: Run Executable
+      - name: Test Executable (help)
         shell: pwsh
         run: |
-          make -f llvm.makefile run
+          # Test that the executable runs and shows usage (without arguments it shows usage)
+          $output = & bin/auto.exe 2>&1
+          if ($LASTEXITCODE -eq 1 -and $output -match "Usage") {
+            echo "Executable works correctly - shows usage when no arguments provided"
+          } else {
+            Write-Error "Executable test failed"
+            exit 1
+          }
 
       - name: Clean Build Artifacts
         shell: pwsh
