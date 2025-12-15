@@ -29,7 +29,7 @@ jobs:
           $version = if ($env:GITHUB_REF -like 'refs/tags/*') { 
             $env:GITHUB_REF -replace 'refs/tags/', '' 
           } else { 
-            ${{ github.event.inputs.version }}
+            '${{ github.event.inputs.version }}'
           }
           $versionNumber = $version -replace '^v', ''
           echo "version=$version" >> $env:GITHUB_OUTPUT
