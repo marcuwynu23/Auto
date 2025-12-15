@@ -1,0 +1,182 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v2.0.3)'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up environment
+        id: version
+        shell: pwsh
+        run: |
+          $version = if ($env:GITHUB_REF -like 'refs/tags/*') { 
+            $env:GITHUB_REF -replace 'refs/tags/', '' 
+          } else { 
+            ${{ github.event.inputs.version }}
+          }
+          echo "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          echo "Version: $version"
+
+      - name: Install Inno Setup
+        uses: ammaraskar/setup-inno-setup@v1.2.0
+        with:
+          version: '6.2.2'
+
+      - name: Setup MinGW-w64
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+          version: latest
+          components: mingw-w64-x86_64-gcc, mingw-w64-x86_64-binutils
+
+      - name: Build executable
+        shell: pwsh
+        run: |
+          # Create bin directory if it doesn't exist
+          if (-not (Test-Path "bin")) {
+            New-Item -ItemType Directory -Path "bin" | Out-Null
+          }
+          
+          # Compile icon resource
+          $windres = "${env:MINGW64}\bin\windres.exe"
+          if (Test-Path $windres) {
+            & $windres resources/icon.rc -O coff -o resources/resource.res
+          } else {
+            # Fallback to system windres
+            windres resources/icon.rc -O coff -o resources/resource.res
+          }
+          
+          # Compile source files
+          $gpp = "${env:MINGW64}\bin\g++.exe"
+          if (Test-Path $gpp) {
+            & $gpp -std=c++11 resources/resource.res -o bin/auto.exe -I include src/*.cpp
+          } else {
+            # Fallback to system compiler
+            c++ -std=c++11 resources/resource.res -o bin/auto.exe -I include src/*.cpp
+          }
+          
+          # Verify executable was created
+          if (Test-Path "bin/auto.exe") {
+            echo "Executable built successfully"
+            Get-Item "bin/auto.exe" | Select-Object Name, Length, LastWriteTime
+          } else {
+            Write-Error "Failed to build executable"
+            exit 1
+          }
+
+      - name: Update installer script version
+        shell: pwsh
+        run: |
+          $version = $env:VERSION
+          $versionNumber = $version -replace '^v', ''
+          $content = Get-Content "installer-script/Auto.iss" -Raw
+          
+          # Update version in OutputBaseFilename
+          $content = $content -replace 'OutputBaseFilename=AutoInstaller\.\d+\.\d+\.\d+', "OutputBaseFilename=AutoInstaller.$versionNumber"
+          
+          # Update AppVersion
+          $content = $content -replace 'AppVersion=\d+\.\d+\.\d+', "AppVersion=$versionNumber"
+          
+          # Update paths to use relative paths
+          $workspace = $env:GITHUB_WORKSPACE -replace '\\', '/'
+          $content = $content -replace 'OutputDir=D:\\Projects\\marcuwynu23\\Auto\\bin', "OutputDir=$workspace/bin"
+          $content = $content -replace 'Source: "D:\\Projects\\marcuwynu23\\Auto\\bin\\auto.exe"', "Source: `"$workspace/bin/auto.exe`""
+          
+          Set-Content -Path "installer-script/Auto.iss" -Value $content
+
+      - name: Build MSI installer
+        shell: pwsh
+        run: |
+          # Use ISCC from Inno Setup
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            $iscc = "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+          }
+          
+          if (-not (Test-Path $iscc)) {
+            Write-Error "Inno Setup compiler not found at $iscc"
+            exit 1
+          }
+          
+          & $iscc "installer-script/Auto.iss"
+          
+          # Verify installer was created
+          $installer = Get-ChildItem -Path "bin" -Filter "AutoInstaller.*.exe" | Select-Object -First 1
+          if ($installer) {
+            echo "Installer built successfully: $($installer.Name)"
+            $installer | Select-Object Name, Length, LastWriteTime
+          } else {
+            Write-Error "Failed to build installer - no matching file found in bin directory"
+            Get-ChildItem -Path "bin" | Select-Object Name
+            exit 1
+          }
+
+      - name: Prepare release artifacts
+        shell: pwsh
+        run: |
+          # Create artifacts directory
+          New-Item -ItemType Directory -Path "release-artifacts" -Force | Out-Null
+          
+          # Copy executable
+          Copy-Item "bin/auto.exe" -Destination "release-artifacts/auto.exe"
+          
+          # Copy installer
+          $installer = Get-ChildItem -Path "bin" -Filter "AutoInstaller.*.exe" | Select-Object -First 1
+          if ($installer) {
+            Copy-Item $installer.FullName -Destination "release-artifacts/$($installer.Name)"
+          }
+          
+          # List artifacts
+          Get-ChildItem "release-artifacts" | Select-Object Name, Length
+
+      - name: Get installer filename
+        id: installer
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem -Path "bin" -Filter "AutoInstaller.*.exe" | Select-Object -First 1
+          if ($installer) {
+            echo "name=$($installer.Name)" >> $env:GITHUB_OUTPUT
+            echo "path=release-artifacts/$($installer.Name)" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Error "Installer file not found"
+            exit 1
+          }
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            release-artifacts/auto.exe
+            ${{ steps.installer.outputs.path }}
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## Release ${{ steps.version.outputs.version }}
+            
+            ### Downloads
+            - **auto.exe** - Standalone executable
+            - **${{ steps.installer.outputs.name }}** - Windows installer
+            
+            ### Installation
+            1. Download the installer for automatic installation
+            2. Or download auto.exe and add it to your PATH manually
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

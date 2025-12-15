@@ -54,3 +54,4 @@ end;
 [Run]
 ; Run AddToPath function after installation to modify the PATH environment variable
 Filename: "{app}\auto.exe"; Parameters: ""; StatusMsg: "Appending Auto Application to PATH..."; AfterInstall: AddToPath;
+
