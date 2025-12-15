@@ -59,11 +59,30 @@ jobs:
           cached: true
 
       - name: Install MinGW-w64 (for windres and make)
-        uses: egor-tensin/setup-mingw@v2
-        with:
-          platform: x64
-          version: latest
-          components: mingw-w64-x86_64-binutils, mingw-w64-x86_64-make
+        shell: pwsh
+        run: |
+          # Install MinGW-w64 using Chocolatey
+          choco install mingw -y
+          
+          # Add MinGW to PATH
+          $mingwPath = "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin"
+          if (Test-Path $mingwPath) {
+            echo "$mingwPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            echo "MinGW installed at: $mingwPath"
+          } else {
+            # Try alternative path
+            $mingwPath = "C:\tools\mingw64\bin"
+            if (Test-Path $mingwPath) {
+              echo "$mingwPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            }
+          }
+          
+          # Install make separately if needed
+          choco install make -y
+          
+          # Verify tools
+          windres --version
+          make --version
 
       - name: Verify Tools
         shell: pwsh
