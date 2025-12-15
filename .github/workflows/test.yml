@@ -1,4 +1,4 @@
-name: Build C++ Executable with LLVM
+name: Test Suite
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  test:
     runs-on: windows-latest
 
     steps:
@@ -54,33 +54,38 @@ jobs:
           make --version
           echo "All tools verified successfully"
 
-      - name: Build Executable
+      - name: Build Tests
         shell: pwsh
         run: |
-          make -f llvm.makefile all
+          make -f llvm.makefile test
           
-          # Verify executable was created
-          if (Test-Path "bin/auto.exe") {
-            echo "Build successful!"
-            Get-Item "bin/auto.exe" | Select-Object Name, Length, LastWriteTime
+          # Verify test executable was created
+          if (Test-Path "test.exe") {
+            echo "Test executable built successfully"
+            Get-Item "test.exe" | Select-Object Name, Length, LastWriteTime
           } else {
-            Write-Error "Build failed - executable not found"
+            Write-Error "Test build failed - test.exe not found"
             exit 1
           }
 
-      - name: Test Executable (help)
+      - name: Run Tests
         shell: pwsh
         run: |
-          # Test that the executable runs and shows usage (without arguments it shows usage)
-          $output = & bin/auto.exe 2>&1
-          if ($LASTEXITCODE -eq 1 -and $output -match "Usage") {
-            echo "Executable works correctly - shows usage when no arguments provided"
-          } else {
-            Write-Error "Executable test failed"
+          make -f llvm.makefile test-run
+          
+          # Check exit code
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Tests failed with exit code $LASTEXITCODE"
             exit 1
+          } else {
+            echo "All tests passed successfully!"
           }
 
-      - name: Clean Build Artifacts
+      - name: Clean Test Artifacts
         shell: pwsh
         run: |
-          make -f llvm.makefile clean
+          if (Test-Path "test.exe") {
+            Remove-Item "test.exe"
+            echo "Test artifacts cleaned"
+          }
+

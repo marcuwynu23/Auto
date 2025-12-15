@@ -3,6 +3,7 @@ BIN = bin/auto.exe
 ICO = resources/icon.rc
 RES = resources/resource.res
 SRC = $(wildcard src/*.cpp)
+SRC_LIB = $(filter-out src/main.cpp,$(SRC))
 SRC_TEST = $(wildcard test/*.cpp)
 INCLUDE = -I include
 
@@ -25,6 +26,16 @@ compile_source: $(SRC)
 # Compile icon resource
 compile_icon: $(ICO)
 	$(RC) $(ICO) -O coff -o $(RES)
+
+# Compile test files
+test: $(SRC_TEST)
+	$(CXX) $(CXXFLAGS) -o test.exe $(INCLUDE) $(SRC_TEST) $(SRC_LIB)
+	@echo "Test executable created: test.exe"
+
+# Run tests
+test-run: test
+	@echo "Running tests..."
+	./test.exe
 
 # Compile experimental test files
 experimental: $(SRC_TEST)
