@@ -37,12 +37,11 @@ jobs:
         with:
           version: '6.2.2'
 
-      - name: Setup LLVM
-        uses: egor-tensin/setup-llvm@v1
+      - name: Install LLVM
+        uses: KyleMayes/install-llvm-action@v2
         with:
-          version: latest
-          platform: x64
-          components: clang, lld
+          version: "latest"
+          cached: true
 
       - name: Install MinGW-w64 (for windres and make)
         uses: egor-tensin/setup-mingw@v2
