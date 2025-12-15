@@ -28,12 +28,38 @@ std::string trim(const std::string& str)
   return str.substr(first, (last - first + 1));
 }
 
+// Helper function to safely get environment variable (cross-platform)
+inline bool isTestMode()
+{
+#ifdef _WIN32
+  // Use Windows-specific secure function to avoid deprecation warning
+  size_t requiredSize = 0;
+  errno_t err = getenv_s(&requiredSize, nullptr, 0, "AUTO_TEST_MODE");
+  if (err != 0 || requiredSize == 0)
+    return false;
+  
+  char* buffer = new char[requiredSize];
+  err = getenv_s(&requiredSize, buffer, requiredSize, "AUTO_TEST_MODE");
+  if (err == 0)
+  {
+    bool result = (std::string(buffer) == "1");
+    delete[] buffer;
+    return result;
+  }
+  delete[] buffer;
+  return false;
+#else
+  // Use standard getenv on non-Windows platforms
+  const char* testMode = std::getenv("AUTO_TEST_MODE");
+  return testMode && std::string(testMode) == "1";
+#endif
+}
+
 // Function to execute the commands synchronously
 void __termExecuteSync(const std::string& command)
 {
   // Skip actual execution in test mode (CI environments)
-  const char* testMode = std::getenv("AUTO_TEST_MODE");
-  if (testMode && std::string(testMode) == "1")
+  if (isTestMode())
   {
     // In test mode, just print what would be executed (for testing)
     std::lock_guard<std::mutex> lock{g_console_mutex};
@@ -47,8 +73,7 @@ void __termExecuteSync(const std::string& command)
 void __termExecuteAsync(const std::string& command)
 {
   // Skip actual execution in test mode (CI environments)
-  const char* testMode = std::getenv("AUTO_TEST_MODE");
-  if (testMode && std::string(testMode) == "1")
+  if (isTestMode())
   {
     // In test mode, just print what would be executed (for testing)
     std::lock_guard<std::mutex> lock{g_console_mutex};
