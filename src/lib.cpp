@@ -13,6 +13,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
 
 // Static mutex for thread-safe console output
 static std::mutex g_console_mutex;
@@ -30,12 +31,30 @@ std::string trim(const std::string& str)
 // Function to execute the commands synchronously
 void __termExecuteSync(const std::string& command)
 {
+  // Skip actual execution in test mode (CI environments)
+  const char* testMode = std::getenv("AUTO_TEST_MODE");
+  if (testMode && std::string(testMode) == "1")
+  {
+    // In test mode, just print what would be executed (for testing)
+    std::lock_guard<std::mutex> lock{g_console_mutex};
+    std::cout << "  [TEST MODE] Would execute: " << command << std::endl;
+    return;
+  }
   system(command.c_str());
 }
 
 // Function to execute the commands asynchronously
 void __termExecuteAsync(const std::string& command)
 {
+  // Skip actual execution in test mode (CI environments)
+  const char* testMode = std::getenv("AUTO_TEST_MODE");
+  if (testMode && std::string(testMode) == "1")
+  {
+    // In test mode, just print what would be executed (for testing)
+    std::lock_guard<std::mutex> lock{g_console_mutex};
+    std::cout << "  [TEST MODE] Would execute async: " << command << std::endl;
+    return;
+  }
   // Capture by value to avoid use-after-free
   std::thread t{[command]
                 {
