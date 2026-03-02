@@ -19,7 +19,7 @@
 static std::mutex g_console_mutex;
 
 // Helper function to trim whitespace from both ends of a string
-std::string trim(const std::string& str)
+std::string trim(const std::string &str)
 {
   size_t first = str.find_first_not_of(" \t\n\r");
   if (first == std::string::npos)
@@ -37,8 +37,8 @@ inline bool isTestMode()
   errno_t err = getenv_s(&requiredSize, nullptr, 0, "AUTO_TEST_MODE");
   if (err != 0 || requiredSize == 0)
     return false;
-  
-  char* buffer = new char[requiredSize];
+
+  char *buffer = new char[requiredSize];
   err = getenv_s(&requiredSize, buffer, requiredSize, "AUTO_TEST_MODE");
   if (err == 0)
   {
@@ -50,13 +50,13 @@ inline bool isTestMode()
   return false;
 #else
   // Use standard getenv on non-Windows platforms
-  const char* testMode = std::getenv("AUTO_TEST_MODE");
+  const char *testMode = std::getenv("AUTO_TEST_MODE");
   return testMode && std::string(testMode) == "1";
 #endif
 }
 
 // Function to execute the commands synchronously
-void __termExecuteSync(const std::string& command)
+void __termExecuteSync(const std::string &command)
 {
   // Skip actual execution in test mode (CI environments)
   if (isTestMode())
@@ -70,7 +70,7 @@ void __termExecuteSync(const std::string& command)
 }
 
 // Function to execute the commands asynchronously
-void __termExecuteAsync(const std::string& command)
+void __termExecuteAsync(const std::string &command)
 {
   // Skip actual execution in test mode (CI environments)
   if (isTestMode())
@@ -89,14 +89,14 @@ void __termExecuteAsync(const std::string& command)
 }
 
 // Function to print the command in the terminal (synchronously)
-void __termPrintSync(int type, const std::string& str)
+void __termPrintSync(int type, const std::string &str)
 {
   std::lock_guard<std::mutex> lock{g_console_mutex};
   std::cout << "  type: " << type << " : " << str << std::endl;
 }
 
 // Function to print the command in the terminal (asynchronously)
-void __termPrintAsync(int type, const std::string& str)
+void __termPrintAsync(int type, const std::string &str)
 {
   std::lock_guard<std::mutex> lock{g_console_mutex};
   std::cout << "  type: " << type << " : " << str << std::endl;
@@ -149,7 +149,7 @@ std::vector<std::string> splitCommand(const std::string &command)
 }
 
 // Helper function to replace tabs with spaces
-void replaceTabs(std::string& str)
+void replaceTabs(std::string &str)
 {
   for (size_t i = 0; i < str.length(); ++i)
   {
@@ -162,141 +162,118 @@ void replaceTabs(std::string& str)
 }
 
 // Function to read and process the script with blocks
-void __processBlocks(const std::string& fileName, const std::string& targetBlock)
+void __processBlocks(const std::string &fileName, const std::string &targetBlock)
 {
   std::ifstream newfile(fileName);
-  int executionType = 0; // Default to SYNC
+  int executionType = 0;
   std::string currentBlock;
-  bool blockFound = false; // Flag to check if the block exists
+  bool blockFound = false;
 
-  if (newfile.is_open())
+  auto buildCommand = [](const std::string &cmdLine,
+                         const std::vector<std::string> &args,
+                         const std::string &mode) -> std::string
   {
-    std::string line;
+    if (args.empty())
+      return "";
 
-    while (std::getline(newfile, line))
+    // 🔥 If command starts with wt → DO NOT WRAP
+    if (args[0] == "wt")
     {
-      // Trim leading and trailing whitespaces
-      line = trim(line);
+      return cmdLine;
+    }
 
+    if (mode == "NORMAL")
+      return "start \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
+
+    if (mode == "MIN")
+      return "start /MIN \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
+
+    if (mode == "BG")
+      return "start /B \"" + args[0] + "\" cmd /C \"" + cmdLine + "\"";
+
+    return cmdLine;
+  };
+
+  if (!newfile.is_open())
+  {
+    std::cout << "Failed to open file: " << fileName << std::endl;
+    return;
+  }
+
+  std::string line;
+
+  while (std::getline(newfile, line))
+  {
+    line = trim(line);
+    if (line.empty())
+      continue;
+
+    if (!line.empty() && line.back() == '{')
+    {
+      currentBlock = trim(line.substr(0, line.length() - 1));
+
+      if (!currentBlock.empty() &&
+          (currentBlock == targetBlock || currentBlock.front() == '.'))
+      {
+        blockFound = true;
+      }
+    }
+    else if (line == "}")
+    {
+      currentBlock.clear();
+    }
+    else if (!currentBlock.empty() &&
+             (currentBlock == targetBlock || currentBlock.front() == '.'))
+    {
       if (line.empty())
         continue;
 
-      // Check for block definition (e.g., dev { or publish {)
-      if (!line.empty() && line.back() == '{')
-      {
-        // Extract block name (before '{'), trim whitespace
-        currentBlock = trim(line.substr(0, line.length() - 1));
+      char type = line[0];
+      if (type != '+' && type != '-' && type != '$')
+        continue;
 
-        // Check if this is the target block or if the block starts with "."
-        if (!currentBlock.empty() && (currentBlock == targetBlock || currentBlock.front() == '.'))
-        {
-          blockFound = true; // Set the flag if the block matches the target
-        }
+      std::string cmdLine = trim(line.substr(1));
+      std::vector<std::string> args = splitCommand(cmdLine);
+
+      if (args.empty())
+        continue;
+
+      std::string command;
+
+      if (type == '+')
+        command = buildCommand(cmdLine, args, "NORMAL");
+      else if (type == '-')
+        command = buildCommand(cmdLine, args, "MIN");
+      else if (type == '$')
+        command = buildCommand(cmdLine, args, "BG");
+
+      if (command.empty())
+        continue;
+
+      if (executionType == 1)
+      {
+        __termPrintAsync(executionType, line);
+        __termExecuteAsync(command);
       }
-      else if (line == "}")
+      else
       {
-        // End of current block
-        currentBlock.clear();
-      }
-      else if (!currentBlock.empty() && (currentBlock == targetBlock || (!currentBlock.empty() && currentBlock.front() == '.')))
-      {
-        // Replace tabs with spaces if "tab" keyword is found in the block
-        if (line.find("tab") != std::string::npos)
-        {
-          replaceTabs(line);
-        }
-
-        // Check if line has at least one character before accessing
-        if (line.empty())
-          continue;
-
-        // If we are in the target block or a special block starting with a dot (".")
-        if (line[0] == '+')
-        {
-          // Process commands within a block
-          std::string cmdLine = line.substr(1);
-          std::vector<std::string> args = splitCommand(cmdLine);
-          
-          // Safety check: ensure args is not empty before accessing args[0]
-          if (args.empty())
-            continue;
-            
-          if (executionType == 1) // Async execution
-          {
-            __termPrintAsync(executionType, line);
-            std::string command = "start \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
-            __termExecuteAsync(command);
-          }
-          else // Sync execution
-          {
-            __termPrintSync(executionType, line);
-            std::string command = "start \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
-            __termExecuteSync(command);
-          }
-        }
-        else if (line[0] == '-')
-        {
-          // Handle minimized execution
-          std::string cmdLine = line.substr(1);
-          std::vector<std::string> args = splitCommand(cmdLine);
-          
-          if (args.empty())
-            continue;
-            
-          if (executionType == 1) // Async execution
-          {
-            __termPrintAsync(executionType, line);
-            std::string command = "start /MIN \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
-            __termExecuteAsync(command);
-          }
-          else // Sync execution
-          {
-            __termPrintSync(executionType, line);
-            std::string command = "start /MIN \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
-            __termExecuteSync(command);
-          }
-        }
-        else if (line[0] == '$')
-        {
-          // Handle background execution
-          std::string cmdLine = line.substr(1);
-          std::vector<std::string> args = splitCommand(cmdLine);
-          
-          if (args.empty())
-            continue;
-            
-          if (executionType == 1) // Async execution
-          {
-            __termPrintAsync(executionType, line);
-            std::string command = "start /B \"" + args[0] + "\" cmd /C \"" + cmdLine + "\"";
-            __termExecuteAsync(command);
-          }
-          else // Sync execution
-          {
-            __termPrintSync(executionType, line);
-            std::string command = "start /B \"" + args[0] + "\" cmd /C \"" + cmdLine + "\"";
-            __termExecuteSync(command);
-          }
-        }
+        __termPrintSync(executionType, line);
+        __termExecuteSync(command);
       }
     }
-
-    // If block is not found, print a message
-    if (!blockFound)
-    {
-      std::cout << "Block \"" << targetBlock << "\" not found in the script." << std::endl;
-    }
-
-    std::cout << "\nEnd:\n" << std::endl;
   }
-  else
+
+  if (!blockFound)
   {
-    std::cout << "Failed to open file: " << fileName << std::endl;
+    std::cout << "Block \"" << targetBlock << "\" not found in the script."
+              << std::endl;
   }
-}
 
+  std::cout << "\nEnd:\n"
+            << std::endl;
+}
 // Main function to execute the script
-void autoRunner(const std::string& sourceFile, const std::string& targetBlock)
+void autoRunner(const std::string &sourceFile, const std::string &targetBlock)
 {
   __processBlocks(sourceFile, targetBlock);
 }
