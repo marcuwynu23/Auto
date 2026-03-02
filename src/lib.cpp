@@ -176,11 +176,13 @@ void __processBlocks(const std::string &fileName, const std::string &targetBlock
     }
 
     // Working directory for all commands = directory containing the .autofile (C++11: no filesystem)
+    // Use large buffer so long paths (e.g. GitHub Actions D:\a\...\repo) and user paths work
     std::string scriptDir;
     {
-        char buf[MAX_PATH];
-        DWORD len = GetFullPathNameA(fileName.c_str(), MAX_PATH, buf, nullptr);
-        if (len > 0 && len < MAX_PATH)
+        const size_t pathBufSize = 4096;
+        char buf[pathBufSize];
+        DWORD len = GetFullPathNameA(fileName.c_str(), (DWORD)pathBufSize, buf, nullptr);
+        if (len > 0 && len < pathBufSize)
         {
             std::string fullPath(buf);
             size_t last = fullPath.find_last_of("/\\");
@@ -188,10 +190,13 @@ void __processBlocks(const std::string &fileName, const std::string &targetBlock
                             ? fullPath.substr(0, last)
                             : fullPath;
         }
-        if (scriptDir.empty() && _getcwd(buf, sizeof(buf)) != nullptr)
+        if (scriptDir.empty() && _getcwd(buf, (int)pathBufSize) != nullptr)
             scriptDir = buf;
         if (scriptDir.empty())
             scriptDir = ".";
+        // Avoid trailing backslash (except for root "C:\") so quoted path in /D and -d is safe
+        if (scriptDir.size() > 3 && (scriptDir.back() == '\\' || scriptDir.back() == '/'))
+            scriptDir.pop_back();
     }
 
     // Helper lambda to build the final command string (runs in scriptDir)
