@@ -32,11 +32,15 @@ A powerful command-line tool designed to streamline your workflow by automating 
 ## ✨ Features
 
 - 🎯 **Block-based Configuration** - Organize commands into named blocks for easy management
-- 🖥️ **Separate Terminal Instances** - Each command runs in its own terminal window
-- ⚡ **Multiple Execution Modes** - Normal, minimized, and background execution
-- 🔄 **Background Processes** - Run commands in the background without blocking
-- 📝 **Comment Support** - Add comments to document your automation scripts
+- 🖥️ **Separate Terminal Instances** - Each command runs in its own terminal window (or Windows Terminal tab)
+- ⚡ **Multiple Execution Modes** - Normal (`+`), minimized (`-`), background (`$`), and Windows Terminal with title (`&`)
+- 🔄 **Background Processes** - Run commands in the background without blocking (`$` or async)
+- 🪟 **Windows Terminal (wt) Support** - Use `wt` as the first token to pass the command through unchanged, or use `& "Title" command` to run in Windows Terminal with a custom tab title
+- 📝 **Comment Support** - Empty lines and lines outside command rules are ignored; use `#`-style comments in your script
 - 🎨 **Simple Syntax** - Easy-to-read and write configuration format
+- 📎 **Quoted Arguments** - Commands support quoted parts as single arguments; surrounding quotes are stripped
+- 🧪 **Test Mode** - Set `AUTO_TEST_MODE=1` to dry-run (print commands without executing), useful for CI
+- 🔒 **Thread-safe Output** - Console output is serialized when mixing sync and async commands
 
 ---
 
@@ -96,7 +100,7 @@ Execute the following command in your terminal:
 auto dev
 ```
 
-Or if using a custom file:
+Or if using a custom file (file name must start with `.`):
 
 ```sh
 auto -f .autofile dev
@@ -106,13 +110,17 @@ auto -f .autofile dev
 
 ## 📖 Command Syntax
 
-Auto supports three execution modes:
+Auto supports four execution modes:
 
-| Symbol | Mode       | Description                                 |
-| ------ | ---------- | ------------------------------------------- |
-| `+`    | Normal     | Runs command in a normal terminal window    |
-| `-`    | Minimized  | Runs command in a minimized terminal window |
-| `$`    | Background | Runs command in the background (no window)  |
+| Symbol | Mode             | Description                                                           |
+| ------ | ---------------- | --------------------------------------------------------------------- |
+| `+`    | Normal           | Runs command in a normal `cmd` window                                 |
+| `-`    | Minimized        | Runs command in a minimized `cmd` window                              |
+| `$`    | Background       | Runs command in the background (no window)                            |
+| `&`    | Windows Terminal | Runs in Windows Terminal with a custom tab title: `& "Title" command` |
+
+- Commands whose first token is `wt` are **not** wrapped; the line is passed through as-is to support full Windows Terminal options.
+- Arguments can be quoted; quoted parts are treated as a single argument and surrounding quotes are removed.
 
 ### Example Configuration
 
@@ -127,19 +135,32 @@ production {
 
   # Start monitoring in minimized window
   - pm2 monit
+
+  # Windows Terminal with custom tab title
+  & "API" node server.js
+  & "Worker" npm run worker
+
 }
 ```
 
 ### Special Blocks
 
-Blocks starting with `.` (dot) are special blocks that can be executed automatically:
+Blocks whose name starts with `.` (dot) are special blocks and can be run by name like any other block (e.g. `auto .init`):
 
 ```cmd
 .init {
-  # This block runs automatically
   + echo "Initializing environment..."
   + npm install
 }
+```
+
+### Test Mode (CI / dry-run)
+
+Set the environment variable `AUTO_TEST_MODE=1` to avoid executing commands. Auto will only print what would be run (e.g. `[TEST MODE] Would execute: ...`). Useful in CI or for validating scripts.
+
+```sh
+set AUTO_TEST_MODE=1
+auto dev
 ```
 
 ---

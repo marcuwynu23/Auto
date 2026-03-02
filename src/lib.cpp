@@ -31,8 +31,8 @@ std::string trim(const std::string &str)
 // Helper function to safely get environment variable (cross-platform)
 inline bool isTestMode()
 {
-#ifdef _WIN32
-  // Use Windows-specific secure function to avoid deprecation warning
+#if defined(_MSC_VER)
+  // MSVC: use secure CRT to avoid deprecation warning
   size_t requiredSize = 0;
   errno_t err = getenv_s(&requiredSize, nullptr, 0, "AUTO_TEST_MODE");
   if (err != 0 || requiredSize == 0)
@@ -49,7 +49,7 @@ inline bool isTestMode()
   delete[] buffer;
   return false;
 #else
-  // Use standard getenv on non-Windows platforms
+  // MinGW, GCC, and other platforms: use standard getenv
   const char *testMode = std::getenv("AUTO_TEST_MODE");
   return testMode && std::string(testMode) == "1";
 #endif
@@ -164,113 +164,154 @@ void replaceTabs(std::string &str)
 // Function to read and process the script with blocks
 void __processBlocks(const std::string &fileName, const std::string &targetBlock)
 {
-  std::ifstream newfile(fileName);
-  int executionType = 0;
-  std::string currentBlock;
-  bool blockFound = false;
+    std::ifstream newfile(fileName);
+    int executionType = 0;
+    std::string currentBlock;
+    bool blockFound = false;
 
-  auto buildCommand = [](const std::string &cmdLine,
-                         const std::vector<std::string> &args,
-                         const std::string &mode) -> std::string
-  {
-    if (args.empty())
-      return "";
-
-    // 🔥 If command starts with wt → DO NOT WRAP
-    if (args[0] == "wt")
+    // Helper lambda to build the final command string
+    auto buildCommand = [](const std::string &cmdLine,
+                           const std::vector<std::string> &args,
+                           const std::string &mode) -> std::string
     {
-      return cmdLine;
+        if (args.empty())
+            return "";
+
+        // 🔥 If command already starts with wt → DO NOT wrap
+        if (args[0] == "wt")
+        {
+            return cmdLine;
+        }
+
+        if (mode == "NORMAL")
+            return "start \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
+
+        if (mode == "MIN")
+            return "start /MIN \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
+
+        if (mode == "BG")
+            return "start /B \"" + args[0] + "\" cmd /C \"" + cmdLine + "\"";
+
+        return cmdLine;
+    };
+
+    if (!newfile.is_open())
+    {
+        std::cout << "Failed to open file: " << fileName << std::endl;
+        return;
     }
 
-    if (mode == "NORMAL")
-      return "start \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
-
-    if (mode == "MIN")
-      return "start /MIN \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
-
-    if (mode == "BG")
-      return "start /B \"" + args[0] + "\" cmd /C \"" + cmdLine + "\"";
-
-    return cmdLine;
-  };
-
-  if (!newfile.is_open())
-  {
-    std::cout << "Failed to open file: " << fileName << std::endl;
-    return;
-  }
-
-  std::string line;
-
-  while (std::getline(newfile, line))
-  {
-    line = trim(line);
-    if (line.empty())
-      continue;
-
-    if (!line.empty() && line.back() == '{')
+    std::string line;
+    while (std::getline(newfile, line))
     {
-      currentBlock = trim(line.substr(0, line.length() - 1));
+        line = trim(line);
+        if (line.empty())
+            continue;
 
-      if (!currentBlock.empty() &&
-          (currentBlock == targetBlock || currentBlock.front() == '.'))
-      {
-        blockFound = true;
-      }
+        // Check for block start
+        if (!line.empty() && line.back() == '{')
+        {
+            currentBlock = trim(line.substr(0, line.length() - 1));
+            if (!currentBlock.empty() &&
+                (currentBlock == targetBlock || currentBlock.front() == '.'))
+            {
+                blockFound = true;
+            }
+            continue;
+        }
+
+        // Check for block end
+        if (line == "}")
+        {
+            currentBlock.clear();
+            continue;
+        }
+
+        // Only process lines inside the target block
+        if (currentBlock.empty() ||
+            (currentBlock != targetBlock && currentBlock.front() != '.'))
+            continue;
+
+        if (line.empty())
+            continue;
+
+        char type = line[0];
+
+        // 🔹 Handle new '&' symbol for Windows Terminal
+        if (type == '&')
+        {
+            std::string content = trim(line.substr(1));
+            if (content.empty() || content[0] != '"')
+                continue;
+
+            // Extract quoted title
+            size_t closingQuote = content.find('"', 1);
+            if (closingQuote == std::string::npos)
+                continue;
+
+            std::string title = content.substr(1, closingQuote - 1);
+
+            // Remaining command
+            std::string remaining = trim(content.substr(closingQuote + 1));
+            if (remaining.empty())
+                continue;
+
+            std::string wtCommand =
+                "wt --title \"" + title +
+                "\" --suppressApplicationTitle cmd /K " + remaining;
+
+            if (executionType == 1)
+            {
+                __termPrintAsync(executionType, line);
+                __termExecuteAsync(wtCommand);
+            }
+            else
+            {
+                __termPrintSync(executionType, line);
+                __termExecuteSync(wtCommand);
+            }
+            continue;
+        }
+
+        // 🔹 Existing '+', '-', '$' handling
+        if (type != '+' && type != '-' && type != '$')
+            continue;
+
+        std::string cmdLine = trim(line.substr(1));
+        std::vector<std::string> args = splitCommand(cmdLine);
+        if (args.empty())
+            continue;
+
+        std::string command;
+        if (type == '+')
+            command = buildCommand(cmdLine, args, "NORMAL");
+        else if (type == '-')
+            command = buildCommand(cmdLine, args, "MIN");
+        else if (type == '$')
+            command = buildCommand(cmdLine, args, "BG");
+
+        if (command.empty())
+            continue;
+
+        if (executionType == 1)
+        {
+            __termPrintAsync(executionType, line);
+            __termExecuteAsync(command);
+        }
+        else
+        {
+            __termPrintSync(executionType, line);
+            __termExecuteSync(command);
+        }
     }
-    else if (line == "}")
+
+    if (!blockFound)
     {
-      currentBlock.clear();
+        std::cout << "Block \"" << targetBlock << "\" not found in the script."
+                  << std::endl;
     }
-    else if (!currentBlock.empty() &&
-             (currentBlock == targetBlock || currentBlock.front() == '.'))
-    {
-      if (line.empty())
-        continue;
 
-      char type = line[0];
-      if (type != '+' && type != '-' && type != '$')
-        continue;
-
-      std::string cmdLine = trim(line.substr(1));
-      std::vector<std::string> args = splitCommand(cmdLine);
-
-      if (args.empty())
-        continue;
-
-      std::string command;
-
-      if (type == '+')
-        command = buildCommand(cmdLine, args, "NORMAL");
-      else if (type == '-')
-        command = buildCommand(cmdLine, args, "MIN");
-      else if (type == '$')
-        command = buildCommand(cmdLine, args, "BG");
-
-      if (command.empty())
-        continue;
-
-      if (executionType == 1)
-      {
-        __termPrintAsync(executionType, line);
-        __termExecuteAsync(command);
-      }
-      else
-      {
-        __termPrintSync(executionType, line);
-        __termExecuteSync(command);
-      }
-    }
-  }
-
-  if (!blockFound)
-  {
-    std::cout << "Block \"" << targetBlock << "\" not found in the script."
-              << std::endl;
-  }
-
-  std::cout << "\nEnd:\n"
-            << std::endl;
+    std::cout << "\nEnd:\n" << std::endl;
 }
 // Main function to execute the script
 void autoRunner(const std::string &sourceFile, const std::string &targetBlock)
