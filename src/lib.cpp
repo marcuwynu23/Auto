@@ -169,10 +169,35 @@ void __processBlocks(const std::string &fileName, const std::string &targetBlock
     std::string currentBlock;
     bool blockFound = false;
 
-    // Helper lambda to build the final command string
-    auto buildCommand = [](const std::string &cmdLine,
-                           const std::vector<std::string> &args,
-                           const std::string &mode) -> std::string
+    if (!newfile.is_open())
+    {
+        std::cout << "Failed to open file: " << fileName << std::endl;
+        return;
+    }
+
+    // Working directory for all commands = directory containing the .autofile (C++11: no filesystem)
+    std::string scriptDir;
+    {
+        char buf[MAX_PATH];
+        DWORD len = GetFullPathNameA(fileName.c_str(), MAX_PATH, buf, nullptr);
+        if (len > 0 && len < MAX_PATH)
+        {
+            std::string fullPath(buf);
+            size_t last = fullPath.find_last_of("/\\");
+            scriptDir = (last != std::string::npos && last > 0)
+                            ? fullPath.substr(0, last)
+                            : fullPath;
+        }
+        if (scriptDir.empty() && _getcwd(buf, sizeof(buf)) != nullptr)
+            scriptDir = buf;
+        if (scriptDir.empty())
+            scriptDir = ".";
+    }
+
+    // Helper lambda to build the final command string (runs in scriptDir)
+    auto buildCommand = [&scriptDir](const std::string &cmdLine,
+                                    const std::vector<std::string> &args,
+                                    const std::string &mode) -> std::string
     {
         if (args.empty())
             return "";
@@ -183,23 +208,16 @@ void __processBlocks(const std::string &fileName, const std::string &targetBlock
             return cmdLine;
         }
 
+        const std::string dirArg = "\"" + scriptDir + "\"";
         if (mode == "NORMAL")
-            return "start \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
-
+            return "start /D " + dirArg + " \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
         if (mode == "MIN")
-            return "start /MIN \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
-
+            return "start /MIN /D " + dirArg + " \"" + args[0] + "\" cmd /K \"" + cmdLine + "\"";
         if (mode == "BG")
-            return "start /B \"" + args[0] + "\" cmd /C \"" + cmdLine + "\"";
+            return "start /B /D " + dirArg + " \"" + args[0] + "\" cmd /C \"" + cmdLine + "\"";
 
         return cmdLine;
     };
-
-    if (!newfile.is_open())
-    {
-        std::cout << "Failed to open file: " << fileName << std::endl;
-        return;
-    }
 
     std::string line;
     while (std::getline(newfile, line))
@@ -251,14 +269,15 @@ void __processBlocks(const std::string &fileName, const std::string &targetBlock
 
             std::string title = content.substr(1, closingQuote - 1);
 
-            // Remaining command
-            std::string remaining = trim(content.substr(closingQuote + 1));
+            // Remaining command (strip surrounding quotes if present)
+            std::string remaining = removeQuotes(trim(content.substr(closingQuote + 1)));
             if (remaining.empty())
                 continue;
 
+            // New tab in current window (-w 0 new-tab), start in script dir (-d), run command; ^" escapes for cmd
             std::string wtCommand =
-                "wt --title \"" + title +
-                "\" --suppressApplicationTitle cmd /K " + remaining;
+                "wt -w 0 new-tab -d \"" + scriptDir + "\" --title \"" + title +
+                "\" --suppressApplicationTitle cmd /K ^\"" + remaining + "^\"";
 
             if (executionType == 1)
             {
