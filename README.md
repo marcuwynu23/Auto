@@ -154,14 +154,6 @@ Blocks whose name starts with `.` (dot) are special blocks and can be run by nam
 }
 ```
 
-### Test Mode (CI / dry-run)
-
-Set the environment variable `AUTO_TEST_MODE=1` to avoid executing commands. Auto will only print what would be run (e.g. `[TEST MODE] Would execute: ...`). Useful in CI or for validating scripts.
-
-```sh
-set AUTO_TEST_MODE=1
-auto dev
-```
 
 ---
 
@@ -195,16 +187,6 @@ make -f llvm.makefile
 cmake -B build -G "MinGW Makefiles"
 cmake --build build
 ```
-
-#### Method 4: Rust Version (Alternative)
-
-```sh
-make -f makefile.rust
-```
-
-The compiled binary will be in `bin/rust/auto`.
-
----
 
 ## ⚠️ Important Notes
 
