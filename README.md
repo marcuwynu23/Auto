@@ -1,10 +1,10 @@
 <div align="center">
 
-# 🚀 Auto
+# Auto
 
 **Automate YoUr Terminal Operation**
 
-A powerful command-line tool designed to streamline your workflow by automating the execution of commands in separate terminal instances.
+A command-line tool that automates workflows by running each script command in its own terminal instance.
 
 [![GitHub stars](https://img.shields.io/github/stars/marcuwynu23/Auto.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/marcuwynu23/Auto/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/marcuwynu23/Auto.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/marcuwynu23/Auto/network)
