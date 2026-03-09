@@ -599,12 +599,116 @@
         border-radius: 3px;
         border: 1px solid var(--border);
       }
+
+      .nav-toggle {
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: #fafafa;
+        cursor: pointer;
+        border-radius: 8px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .nav-toggle:hover { background: rgba(255,255,255,0.1); }
+      .nav-toggle__bar {
+        display: block;
+        width: 22px;
+        height: 2.5px;
+        background: currentColor;
+        border-radius: 2px;
+        transition: transform 0.25s, opacity 0.25s;
+      }
+      body.nav-open .nav-toggle__bar:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+      body.nav-open .nav-toggle__bar:nth-child(2) { opacity: 0; }
+      body.nav-open .nav-toggle__bar:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+      .nav-backdrop, .nav-drawer { display: none; }
+
+      @media (max-width: 768px) {
+        .header-inner { position: relative; }
+        .nav-toggle { display: flex; order: 2; margin-left: auto; }
+        .header .nav { display: none; }
+        .nav-backdrop {
+          display: block;
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.5);
+          z-index: 1001;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.25s, visibility 0.25s;
+        }
+        body.nav-open .nav-backdrop { opacity: 1; visibility: visible; }
+        .nav-drawer {
+          display: block;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: min(280px, 85vw);
+          height: 100%;
+          background: var(--surface);
+          box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+          z-index: 1002;
+          overflow-y: auto;
+          transform: translateX(-100%);
+          transition: transform 0.25s ease-out;
+        }
+        body.nav-open .nav-drawer { transform: translateX(0); }
+        .nav-drawer__links { list-style: none; margin: 0; padding: 1rem 0; }
+        .nav-drawer__links li { margin: 0; }
+        .nav-drawer__links a {
+          display: flex;
+          align-items: center;
+          padding: 1rem 1.5rem;
+          color: var(--text);
+          text-decoration: none;
+          font-weight: 500;
+          font-size: 1rem;
+          transition: background 0.15s;
+        }
+        .nav-drawer__links a:hover { background: var(--border); color: var(--accent); }
+        body.nav-open { overflow: hidden; }
+
+        .hero { min-height: auto; padding: 2rem 0; }
+        .hero-inner { grid-template-columns: 1fr; gap: 1.5rem; padding: 1.5rem 1rem; }
+        .hero h1 { font-size: clamp(1.5rem, 5vw, 2.25rem); }
+        .hero .tagline { font-size: 0.95rem; }
+        .hero-desc { font-size: 0.9rem; margin-bottom: 1.25rem; }
+        .hero-tags { margin-bottom: 1.25rem; gap: 0.4rem; }
+        .hero .hero-tags span { font-size: 0.7rem; padding: 0.25rem 0.5rem; }
+        .hero-script-editor pre { padding: 0.75rem 1rem; font-size: 0.75rem; }
+        .btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+        section { padding: 1.5rem 0; }
+        section h2 { font-size: 1.15rem; margin-bottom: 0.75rem; }
+        .features-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+        .feature-card { padding: 1rem; }
+        .feature-card h3 { font-size: 0.9rem; }
+        .feature-card p { font-size: 0.8rem; }
+        .footer-inner { flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; }
+        .footer-links { justify-content: center; }
+      }
+      @media (max-width: 480px) {
+        .hero-inner { padding: 1rem 0.75rem; }
+        .hero h1 { font-size: 1.375rem; }
+        .hero .tagline { font-size: 0.9rem; }
+        section h2 { font-size: 1.05rem; }
+      }
     </style>
   </head>
   <body>
     <header class="header">
       <div class="header-inner">
         <a href="index.html" class="logo">.Autofile</a>
+        <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+          <span class="nav-toggle__bar"></span>
+          <span class="nav-toggle__bar"></span>
+          <span class="nav-toggle__bar"></span>
+        </button>
         <nav class="nav">
           <a href="index.html">Home</a>
           <a href="index.html#features">Features</a>
@@ -612,6 +716,16 @@
           <a href="downloads.html">Downloads</a>
           <a href="repositories.html">Repositories</a>
         </nav>
+        <div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
+        <div class="nav-drawer" id="nav-drawer" role="dialog" aria-label="Navigation menu" aria-hidden="true">
+          <ul class="nav-drawer__links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="documentation.html">Documentation</a></li>
+            <li><a href="downloads.html">Downloads</a></li>
+            <li><a href="repositories.html">Repositories</a></li>
+          </ul>
+        </div>
       </div>
     </header>
 
@@ -620,7 +734,7 @@
         <div class="hero-inner">
           <div class="hero-content">
             <h1>Auto</h1>
-            <p class="tagline">Automate YoUr Terminal Operation</p>
+            <p class="tagline">Automate Your Terminal Operation</p>
             <p class="hero-desc">
               Start your servers, tools, and scripts from one command. Define what to run in a simple file—Auto opens each in its own window or in the background. No more opening five terminals by hand.
             </p>
@@ -947,5 +1061,6 @@
         </div>
       </div>
     </footer>
+  <script src="nav.js"></script>
   </body>
 </html>

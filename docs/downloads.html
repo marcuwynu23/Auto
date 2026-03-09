@@ -203,12 +203,42 @@
       color: #1793d1;
       background: rgba(23, 147, 209, 0.1);
     }
+
+    .nav-toggle { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 44px; height: 44px; padding: 0; border: none; background: transparent; color: #fafafa; cursor: pointer; border-radius: 8px; -webkit-tap-highlight-color: transparent; }
+    .nav-toggle:hover { background: rgba(255,255,255,0.1); }
+    .nav-toggle__bar { display: block; width: 22px; height: 2.5px; background: currentColor; border-radius: 2px; transition: transform 0.25s, opacity 0.25s; }
+    body.nav-open .nav-toggle__bar:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+    body.nav-open .nav-toggle__bar:nth-child(2) { opacity: 0; }
+    body.nav-open .nav-toggle__bar:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+    .nav-backdrop, .nav-drawer { display: none; }
+    @media (max-width: 768px) {
+      .header-inner { position: relative; }
+      .nav-toggle { display: flex; order: 2; margin-left: auto; }
+      .header .nav { display: none; }
+      .nav-backdrop { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1001; opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s; }
+      body.nav-open .nav-backdrop { opacity: 1; visibility: visible; }
+      .nav-drawer { display: block; position: fixed; top: 0; left: 0; width: min(280px, 85vw); height: 100%; background: var(--surface); box-shadow: 4px 0 24px rgba(0,0,0,0.15); z-index: 1002; overflow-y: auto; transform: translateX(-100%); transition: transform 0.25s ease-out; }
+      body.nav-open .nav-drawer { transform: translateX(0); }
+      .nav-drawer__links { list-style: none; margin: 0; padding: 1rem 0; }
+      .nav-drawer__links li { margin: 0; }
+      .nav-drawer__links a { display: flex; align-items: center; padding: 1rem 1.5rem; color: var(--text); text-decoration: none; font-weight: 500; font-size: 1rem; transition: background 0.15s; }
+      .nav-drawer__links a:hover { background: var(--border); color: var(--accent); }
+      body.nav-open { overflow: hidden; }
+      .page-title { font-size: 1.25rem; }
+      .footer-inner { flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; }
+      .footer-links { justify-content: center; }
+    }
   </style>
 </head>
 <body>
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">.Autofile</a>
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
       <nav class="nav">
         <a href="index.html">Home</a>
         <a href="index.html#features">Features</a>
@@ -216,6 +246,16 @@
         <a href="downloads.html">Downloads</a>
         <a href="repositories.html">Repositories</a>
       </nav>
+      <div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
+      <div class="nav-drawer" id="nav-drawer" role="dialog" aria-label="Navigation menu" aria-hidden="true">
+        <ul class="nav-drawer__links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#features">Features</a></li>
+          <li><a href="documentation.html">Documentation</a></li>
+          <li><a href="downloads.html">Downloads</a></li>
+          <li><a href="repositories.html">Repositories</a></li>
+        </ul>
+      </div>
     </div>
   </header>
 
@@ -243,5 +283,6 @@
       </div>
     </div>
   </footer>
+  <script src="nav.js"></script>
 </body>
 </html>
