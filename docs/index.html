@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auto — Automate YoUr Terminal Operation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fafafa;
+        --surface: #fff;
+        --border: #e5e5e5;
+        --text: #1a1a1a;
+        --text-muted: #6b6b6b;
+      --accent: #1793d1;
+      --accent-hover: #1380b8;
+      --blue: #1793d1;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Ubuntu", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        padding-top: 56px;
+        padding-bottom: 80px;
+      }
+
+      main.container-fluid,
+      .container-fluid {
+        width: 100%;
+        margin: 0;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      @media (min-width: 576px) {
+        main.container-fluid,
+        .container-fluid {
+          padding-left: 1.5rem;
+          padding-right: 1.5rem;
+        }
+      }
+
+      /* ----- Fixed Header ----- */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        height: 56px;
+        background: #161b22;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+      }
+
+      .header-inner {
+        width: 100%;
+        padding: 0 1rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      @media (min-width: 576px) {
+        .header-inner {
+          padding: 0 1.5rem;
+        }
+      }
+
+      .logo {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #fafafa;
+        text-decoration: none;
+      }
+
+      .nav {
+        display: flex;
+        gap: 0.25rem;
+      }
+
+      .nav a {
+        color: #a3a3a3;
+        text-decoration: none;
+        font-size: 0.875rem;
+        padding: 0.4rem 0.6rem;
+      }
+
+      .nav a:hover {
+        color: #fafafa;
+      }
+
+      /* ----- Hero ----- (full-bleed, no container padding) */
+      .hero {
+        background: linear-gradient(135deg, #0d1117 0%, #161b22 35%, #21262d 60%, #1793d1 100%);
+        min-height: calc(100vh - 56px);
+        min-height: calc(100dvh - 56px);
+        display: flex;
+        align-items: center;
+        padding: 4rem 0;
+        text-align: left;
+        margin-left: -1rem;
+        margin-right: -1rem;
+        width: calc(100% + 2rem);
+      }
+
+      @media (min-width: 576px) {
+        .hero {
+          margin-left: -1.5rem;
+          margin-right: -1.5rem;
+          width: calc(100% + 3rem);
+        }
+      }
+
+      .hero-inner {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        align-items: center;
+        width: 100%;
+        padding: 2rem 1rem;
+      }
+
+      @media (min-width: 576px) {
+        .hero-inner {
+          padding: 2rem 1.5rem;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .hero-inner {
+          grid-template-columns: 1fr 1fr;
+          gap: 3rem;
+        }
+      }
+
+      .hero-content {
+        min-width: 0;
+      }
+
+      .hero-script {
+        min-width: 0;
+      }
+
+      /* Hero code block — VS Code Dark+ style */
+      .hero-script-editor {
+        background: #1e1e1e;
+        border: 1px solid #333;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+
+      .hero-script-tabbar {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        padding: 0 0.5rem 0 0.75rem;
+        background: #252526;
+        border-bottom: 1px solid #333;
+        min-height: 2.25rem;
+      }
+
+      .hero-script-tab {
+        font-size: 0.8125rem;
+        font-family: Consolas, "Courier New", monospace;
+        padding: 0.4rem 1rem;
+        background: #252526;
+        color: #969696;
+        border: none;
+        border-bottom: 2px solid transparent;
+        border-radius: 0;
+        margin-bottom: -1px;
+        position: relative;
+      }
+
+      .hero-script-tab.active {
+        background: #1e1e1e;
+        color: #fff;
+        border-bottom-color: #007acc;
+      }
+
+      .hero-script-tab span {
+        color: inherit;
+      }
+
+      .hero-script pre {
+        margin: 0;
+        padding: 1rem 1.25rem;
+        background: #1e1e1e;
+        overflow-x: auto;
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        color: #d4d4d4;
+        font-family: Consolas, "Courier New", monospace;
+      }
+
+      .hero-script pre code {
+        background: none;
+        padding: 0;
+        border: none;
+        color: inherit;
+      }
+
+      /* .autofile syntax — VS Code Dark+ */
+      .hero-script .autofile-section {
+        color: #4ec9b0;
+      }
+      .hero-script .autofile-operator {
+        color: #569cd6;
+      }
+      .hero-script .autofile-brace {
+        color: #ffd700;
+      }
+      .hero-script .autofile-comment {
+        color: #6a9955;
+      }
+      .hero-script .autofile-command {
+        color: #9cdcfe;
+      }
+      .hero-script .autofile-string {
+        color: #ce9178;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.5rem, 6vw, 3.5rem);
+        font-weight: 500;
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.03em;
+        color: #fff;
+        line-height: 1.1;
+      }
+
+      .hero .tagline {
+        font-size: 1rem;
+        color: #8b949e;
+        margin: 0 0 1rem;
+        font-weight: 400;
+        letter-spacing: 0.01em;
+      }
+
+      .hero .hero-desc {
+        font-size: 0.9375rem;
+        color: #c9d1d9;
+        line-height: 1.6;
+        margin: 0 0 1.5rem;
+      }
+
+      .hero-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .hero .hero-tags span {
+        font-size: 0.75rem;
+        color: #c6ced6;
+        background: rgba(23, 147, 209, 0.15);
+        border: 1px solid rgba(23, 147, 209, 0.4);
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+      }
+
+      .hero-cta {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        font-size: 0.875rem;
+        padding: 0.6rem 1.25rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-family: inherit;
+      }
+
+      .btn-primary {
+        background: #fff;
+        color: #000;
+        border: 1px solid #fff;
+      }
+
+      .btn-primary:hover {
+        background: #e5e5e5;
+        color: #000;
+        border-color: #e5e5e5;
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: #a3a3a3;
+        border: 1px solid #404040;
+      }
+
+      .btn-outline:hover {
+        border-color: #737373;
+        color: #fff;
+      }
+
+      .hero .btn-primary {
+        background: #1793d1;
+        color: #fff;
+        border: 1px solid #1793d1;
+      }
+
+      .hero .btn-primary:hover {
+        background: #1380b8;
+        color: #fff;
+        border-color: #1380b8;
+      }
+
+      .hero .btn-outline {
+        background: rgba(23, 147, 209, 0.2);
+        color: #fff;
+        border: 1px solid rgba(23, 147, 209, 0.6);
+      }
+
+      .hero .btn-outline:hover {
+        background: rgba(23, 147, 209, 0.35);
+        color: #fff;
+        border-color: #1793d1;
+      }
+
+      /* ----- Sections ----- */
+      section {
+        padding: 2rem 0;
+        border-top: 1px solid var(--border);
+      }
+
+      section:first-of-type {
+        border-top: 0;
+      }
+
+      section h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 1rem;
+        color: #161b22;
+      }
+
+      section h3 {
+        color: #161b22;
+      }
+
+      .intro-text,
+      .why-list,
+      .when-list,
+      .advantages-list {
+        font-size: 0.9375rem;
+        color: var(--text-muted);
+        line-height: 1.65;
+        margin: 0 0 1rem;
+      }
+
+      .intro-text {
+        max-width: 42rem;
+      }
+
+      .why-list,
+      .when-list,
+      .advantages-list {
+        padding-left: 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .why-list li,
+      .when-list li,
+      .advantages-list li {
+        margin-bottom: 0.5rem;
+      }
+
+      .use-case-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+      }
+
+      .use-case-card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem;
+      }
+
+      .use-case-card p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .section-lead {
+        font-size: 0.9375rem;
+        color: var(--text-muted);
+        margin: 0 0 1.25rem;
+        max-width: 42rem;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+      }
+
+      .feature-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .feature-card .icon {
+        flex-shrink: 0;
+        width: 1.25rem;
+        height: 1.25rem;
+        color: var(--text-muted);
+      }
+
+      .feature-card .icon svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .feature-card h3 {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+      }
+
+      .feature-card p {
+        margin: 0;
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .doc-links,
+      .download-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .doc-links a,
+      .download-links a {
+        color: var(--accent);
+        text-decoration: none;
+        font-size: 0.875rem;
+      }
+
+      .doc-links a:hover,
+      .download-links a:hover {
+        text-decoration: underline;
+      }
+
+      .github-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .github-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .github-card:last-child {
+        border-bottom: 0;
+      }
+
+      .github-card h3 {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .github-card p {
+        margin: 0.15rem 0 0;
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+      }
+
+      .github-card a {
+        color: var(--blue);
+        text-decoration: none;
+        font-size: 0.875rem;
+      }
+
+      .github-card a:hover {
+        text-decoration: underline;
+      }
+
+      /* ----- Fixed Footer ----- */
+      .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        min-height: 64px;
+        padding: 0.75rem 0;
+        background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .footer-inner {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      @media (min-width: 576px) {
+        .footer-inner {
+          padding: 0 1.5rem;
+        }
+      }
+
+      .footer-credit {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #8b949e;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .footer-credit a {
+        color: #1793d1;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      .footer-credit a:hover {
+        color: #58a6ff;
+        text-decoration: underline;
+      }
+
+      .footer-links {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .footer-links a {
+        font-size: 0.8125rem;
+        color: #8b949e;
+        text-decoration: none;
+        padding: 0.35rem 0.6rem;
+        border-radius: 4px;
+        transition: color 0.2s, background 0.2s;
+      }
+
+      .footer-links a:hover {
+        color: #1793d1;
+        background: rgba(23, 147, 209, 0.1);
+      }
+
+      code {
+        font-family: ui-monospace, monospace;
+        font-size: 0.85em;
+        background: var(--surface);
+        padding: 0.1rem 0.3rem;
+        border-radius: 3px;
+        border: 1px solid var(--border);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-inner">
+        <a href="index.html" class="logo">.Autofile</a>
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="index.html#features">Features</a>
+          <a href="documentation.html">Documentation</a>
+          <a href="downloads.html">Downloads</a>
+          <a href="repositories.html">Repositories</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container-fluid">
+      <section class="hero" id="home">
+        <div class="hero-inner">
+          <div class="hero-content">
+            <h1>Auto</h1>
+            <p class="tagline">Automate YoUr Terminal Operation</p>
+            <p class="hero-desc">
+              Start your servers, tools, and scripts from one command. Define what to run in a simple file—Auto opens each in its own window or in the background. No more opening five terminals by hand.
+            </p>
+            <div class="hero-tags">
+              <span>CLI</span>
+              <span>automation</span>
+              <span>terminal</span>
+              <span>Windows</span>
+              <span>.autofile</span>
+              <span>one command</span>
+            </div>
+            <div class="hero-cta">
+              <a href="downloads.html" class="btn btn-primary">Get Auto</a>
+              <a href="documentation.html" class="btn btn-outline">See how it works</a>
+            </div>
+          </div>
+          <div class="hero-script">
+            <div class="hero-script-editor">
+              <div class="hero-script-tabbar">
+                <div class="hero-script-tab active"><span>.autofile</span></div>
+              </div>
+              <pre><code><span class="autofile-section">production</span> <span class="autofile-brace">{</span>
+  <span class="autofile-comment"># Start services in background</span>
+  <span class="autofile-operator">$</span> <span class="autofile-command">nginx.exe</span>
+  <span class="autofile-operator">$</span> <span class="autofile-command">redis-server.exe</span>
+
+  <span class="autofile-comment"># Start main application normally</span>
+  <span class="autofile-operator">+</span> <span class="autofile-command">node app.js</span>
+
+  <span class="autofile-comment"># Start monitoring in minimized window</span>
+  <span class="autofile-operator">-</span> <span class="autofile-command">pm2 monit</span>
+
+  <span class="autofile-comment"># Windows Terminal with custom tab title</span>
+  <span class="autofile-operator">&</span> <span class="autofile-string">"API"</span> <span class="autofile-command">node server.js</span>
+  <span class="autofile-operator">&</span> <span class="autofile-string">"Worker"</span> <span class="autofile-command">npm run worker</span>
+<span class="autofile-brace">}</span></code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="what">
+        <h2>What is Auto?</h2>
+        <p class="intro-text">
+          Auto is a small Windows tool that starts multiple programs or servers
+          for you from a single command. You list what you want to run in a
+          simple config file; Auto opens each one in its own window (or in the
+          background). No more opening five terminals by hand every morning—one
+          command and you’re ready to work.
+        </p>
+      </section>
+
+      <section id="why">
+        <h2>Why use Auto?</h2>
+        <p class="section-lead">
+          Spend less time on repetitive setup and more time building.
+        </p>
+        <ul class="why-list">
+          <li>
+            <strong>Save time</strong> — Start your full dev environment with
+            one command instead of many.
+          </li>
+          <li>
+            <strong>Stay consistent</strong> — Same setup every time: frontend,
+            backend, database, watchers—all in one place.
+          </li>
+          <li>
+            <strong>Keep things visible</strong> — Each app runs in its own
+            window so you can see logs and output where you need them.
+          </li>
+          <li>
+            <strong>Simple to share</strong> — One config file in your project;
+            teammates run the same command and get the same environment.
+          </li>
+          <li>
+            <strong>Free and open source</strong> — No account, no subscription.
+            Download and use.
+          </li>
+        </ul>
+      </section>
+
+      <section id="when">
+        <h2>When to use Auto?</h2>
+        <p class="section-lead">
+          Perfect for everyday development and any workflow that needs several
+          things running at once.
+        </p>
+        <div class="use-case-card">
+          <h3>Daily development</h3>
+          <p>
+            You work on a project that needs a frontend server, a backend API, a
+            database, and maybe a file watcher. With Auto, one command starts
+            them all in separate windows with clear labels.
+          </p>
+        </div>
+        <div class="use-case-card">
+          <h3>Running multiple servers</h3>
+          <p>
+            Microservices, APIs, or multiple apps that need to run together.
+            Define them once in a config file and launch everything with a
+            single <code>auto dev</code> (or any name you choose).
+          </p>
+        </div>
+        <div class="use-case-card">
+          <h3>Background services</h3>
+          <p>
+            Some tasks (e.g. killing old processes, starting a local DB) are
+            better run in the background or in a minimized window. Auto can do
+            that so your main terminals stay clean.
+          </p>
+        </div>
+        <div class="use-case-card">
+          <h3>Onboarding and demos</h3>
+          <p>
+            New teammates or a quick demo? They run one command and get the same
+            environment. No “run these five commands in order” instructions.
+          </p>
+        </div>
+      </section>
+
+      <section id="advantages">
+        <h2>Advantages at a glance</h2>
+        <ul class="advantages-list">
+          <li>One command starts everything you need.</li>
+          <li>Each app in its own window—easy to watch and debug.</li>
+          <li>Simple text config: no GUI to learn, easy to version in Git.</li>
+          <li>Works with Windows Terminal and supports custom tab titles.</li>
+          <li>
+            Optional background or minimized windows for services you don’t need
+            to see.
+          </li>
+          <li>Lightweight, no runtime or account required.</li>
+        </ul>
+      </section>
+
+      <section id="features">
+        <h2>What you can do</h2>
+        <p class="section-lead">
+          Organize commands into named groups, choose how each runs (visible,
+          minimized, or background), and use Windows Terminal with custom tab
+          names.
+        </p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <span class="icon" aria-hidden="true"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 8.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+                /></svg
+            ></span>
+            <div>
+              <h3>Organize by task</h3>
+              <p>
+                Group commands into named blocks like “dev” or “production” and
+                run exactly what you need.
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="icon" aria-hidden="true"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"
+                /></svg
+            ></span>
+            <div>
+              <h3>Separate windows</h3>
+              <p>
+                Each command runs in its own window or tab so you can see every
+                app’s output clearly.
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="icon" aria-hidden="true"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"
+                /></svg
+            ></span>
+            <div>
+              <h3>Choose how each runs</h3>
+              <p>
+                Run in a normal window, minimized, in the background, or in
+                Windows Terminal with a custom tab title.
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="icon" aria-hidden="true"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                /></svg
+            ></span>
+            <div>
+              <h3>Background and minimized</h3>
+              <p>
+                Services that don’t need a visible window can run in the
+                background or minimized.
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="icon" aria-hidden="true"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M6.75 7.5a3 3 0 1 1 3-3h4.5a3 3 0 0 1 3 3v4.5a3 3 0 0 1-3 3h-4.5a3 3 0 0 1-3-3v-4.5ZM3.75 16.5a3 3 0 0 1 3-3h4.5a3 3 0 0 1 3 3V21a3 3 0 0 1-3 3h-4.5a3 3 0 0 1-3-3v-4.5ZM20.25 7.5a3 3 0 0 0-3-3h-4.5a3 3 0 0 0-3 3v4.5a3 3 0 0 0 3 3h4.5a3 3 0 0 0 3-3v-4.5Z"
+                /></svg
+            ></span>
+            <div>
+              <h3>Windows Terminal</h3>
+              <p>
+                Use Windows Terminal with custom tab names so you can tell
+                servers apart at a glance.
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="icon" aria-hidden="true"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5-5.5-5.5 16.5-4.5Z"
+                /></svg
+            ></span>
+            <div>
+              <h3>Simple config file</h3>
+              <p>
+                One text file in your project. Add comments, version it in Git,
+                and share with your team.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="documentations">
+        <h2>Learn more</h2>
+        <div class="doc-links">
+          <a href="documentation.html"
+            >How to use Auto — Install and run your first setup</a
+          >
+          <a href="downloads.html">Downloads — Get the latest release</a>
+          <a href="repositories.html"
+            >Repositories — Auto and VS Code extension</a
+          >
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <p class="footer-credit">
+          Made with ❤️ by
+          <a href="https://github.com/marcuwynu23" target="_blank" rel="noopener">Mark Wayne Menorca</a>
+        </p>
+        <div class="footer-links">
+          <a
+            href="https://github.com/marcuwynu23/Auto"
+            target="_blank"
+            rel="noopener"
+            >GitHub</a
+          >
+          <a
+            href="https://github.com/marcuwynu23/Auto/issues"
+            target="_blank"
+            rel="noopener"
+            >Report Bug</a
+          >
+          <a
+            href="https://github.com/marcuwynu23/Auto/issues"
+            target="_blank"
+            rel="noopener"
+            >Request Feature</a
+          >
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
