@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Repositories — Auto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #fafafa;
+      --surface: #fff;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --blue: #1793d1;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Ubuntu', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-top: 56px;
+      padding-bottom: 80px;
+    }
+
+    .container-fluid {
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    @media (min-width: 576px) {
+      .container-fluid { padding-left: 1.5rem; padding-right: 1.5rem; }
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 56px;
+      background: #161b22;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+    }
+
+    .header-inner {
+      width: 100%;
+      padding: 0 1rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    @media (min-width: 576px) {
+      .header-inner { padding: 0 1.5rem; }
+    }
+
+    .logo {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #fafafa;
+      text-decoration: none;
+    }
+
+    .nav { display: flex; gap: 0.25rem; }
+
+    .nav a {
+      color: #a3a3a3;
+      text-decoration: none;
+      font-size: 0.875rem;
+      padding: 0.4rem 0.6rem;
+    }
+
+    .nav a:hover { color: #fafafa; }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 0 1.5rem;
+      padding-top: 2rem;
+      color: #161b22;
+    }
+
+    .repo-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .repo-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .repo-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+      color: #161b22;
+    }
+
+    .repo-card p {
+      margin: 0.25rem 0 0;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .repo-card a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .repo-card a:hover { text-decoration: underline; }
+
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      min-height: 64px;
+      padding: 0.75rem 0;
+      background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .footer-inner {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    @media (min-width: 576px) {
+      .footer-inner { padding: 0 1.5rem; }
+    }
+
+    .footer-credit {
+      margin: 0;
+      font-size: 0.875rem;
+      color: #8b949e;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .footer-credit a {
+      color: #1793d1;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .footer-credit a:hover {
+      color: #58a6ff;
+      text-decoration: underline;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.8125rem;
+      color: #8b949e;
+      text-decoration: none;
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: #1793d1;
+      background: rgba(23, 147, 209, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">.Autofile</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="index.html#features">Features</a>
+        <a href="documentation.html">Documentation</a>
+        <a href="downloads.html">Downloads</a>
+        <a href="repositories.html">Repositories</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container-fluid">
+    <h1 class="page-title">Repositories</h1>
+
+    <div class="repo-section">
+      <div class="repo-card">
+        <div>
+          <h3>Auto (CLI)</h3>
+          <p>Main repository — Automate YoUr Terminal Operation</p>
+        </div>
+        <a href="https://github.com/marcuwynu23/Auto" target="_blank" rel="noopener">github.com/marcuwynu23/Auto</a>
+      </div>
+      <div class="repo-card">
+        <div>
+          <h3>AutoFile VS Code Extension</h3>
+          <p>VS Code extension for .autofile syntax highlighting and workflows</p>
+        </div>
+        <a href="https://github.com/marcuwynu23/autofile-extension" target="_blank" rel="noopener">github.com/marcuwynu23/autofile-extension</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-credit">Made with ❤️ by <a href="https://github.com/marcuwynu23" target="_blank" rel="noopener">Mark Wayne Menorca</a></p>
+      <div class="footer-links">
+        <a href="https://github.com/marcuwynu23/Auto" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/marcuwynu23/Auto/issues" target="_blank" rel="noopener">Report Bug</a>
+        <a href="https://github.com/marcuwynu23/Auto/issues" target="_blank" rel="noopener">Request Feature</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation — Auto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #fafafa;
+      --surface: #fff;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --accent: #1793d1;
+      --accent-hover: #1380b8;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Ubuntu', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-top: 56px;
+      padding-bottom: 80px;
+    }
+
+    .container-fluid {
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    @media (min-width: 576px) {
+      .container-fluid { padding-left: 1.5rem; padding-right: 1.5rem; }
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 56px;
+      background: #161b22;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+    }
+
+    .header-inner {
+      width: 100%;
+      padding: 0 1rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    @media (min-width: 576px) {
+      .header-inner { padding: 0 1.5rem; }
+    }
+
+    .logo {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #fafafa;
+      text-decoration: none;
+    }
+
+    .nav {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .nav a {
+      color: #a3a3a3;
+      text-decoration: none;
+      font-size: 0.875rem;
+      padding: 0.4rem 0.6rem;
+    }
+
+    .nav a:hover { color: #fafafa; }
+
+    .doc-page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 0 2rem;
+      padding-top: 2rem;
+      color: #161b22;
+    }
+
+    .doc-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .doc-section h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0 0 0.75rem;
+      color: #161b22;
+    }
+
+    .doc-section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1.25rem 0 0.5rem;
+      color: #161b22;
+    }
+
+    .doc-section p {
+      margin: 0 0 0.75rem;
+      font-size: 0.9375rem;
+      color: var(--text);
+    }
+
+    .doc-section ul {
+      margin: 0 0 1rem;
+      padding-left: 1.25rem;
+    }
+
+    .doc-section li {
+      margin-bottom: 0.35rem;
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+    }
+
+    .doc-section pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      margin: 0.75rem 0 1rem;
+    }
+
+    .doc-section code {
+      font-family: ui-monospace, monospace;
+      font-size: 0.85em;
+      background: var(--surface);
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .doc-section pre code {
+      background: none;
+      padding: 0;
+      border: 0;
+    }
+
+    .doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      margin: 0.75rem 0 1rem;
+    }
+
+    .doc-table th,
+    .doc-table td {
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+    }
+
+    .doc-table th {
+      background: var(--surface);
+      font-weight: 600;
+    }
+
+    .doc-table td:first-child {
+      font-family: ui-monospace, monospace;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      min-height: 64px;
+      padding: 0.75rem 0;
+      background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .footer-inner {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    @media (min-width: 576px) {
+      .footer-inner { padding: 0 1.5rem; }
+    }
+
+    .footer-credit {
+      margin: 0;
+      font-size: 0.875rem;
+      color: #8b949e;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .footer-credit a {
+      color: #1793d1;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .footer-credit a:hover {
+      color: #58a6ff;
+      text-decoration: underline;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .footer-links a {
+      font-size: 0.8125rem;
+      color: #8b949e;
+      text-decoration: none;
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: #1793d1;
+      background: rgba(23, 147, 209, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">.Autofile</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="index.html#features">Features</a>
+        <a href="documentation.html">Documentation</a>
+        <a href="downloads.html">Downloads</a>
+        <a href="repositories.html">Repositories</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container-fluid">
+    <h1 class="doc-page-title">Documentation</h1>
+
+    <section class="doc-section" id="installation">
+      <h2>Installation</h2>
+      <p>Install Auto using one of the following options.</p>
+      <h3>Option 1: Pre-built binary</h3>
+      <ol>
+        <li>Go to the <a href="https://github.com/marcuwynu23/Auto/releases" target="_blank" rel="noopener">Releases</a> page.</li>
+        <li>Download the latest <code>auto.exe</code> or <code>AutoInstaller.*.exe</code>.</li>
+        <li>Installer: run the installer and follow the setup wizard.</li>
+        <li>Standalone: add <code>auto.exe</code> to your system PATH.</li>
+      </ol>
+      <h3>Option 2: Build from source</h3>
+      <p>See the <a href="https://github.com/marcuwynu23/Auto#-building" target="_blank" rel="noopener">Building section on GitHub</a> for prerequisites and build commands (Make or CMake).</p>
+    </section>
+
+    <section class="doc-section" id="usage">
+      <h2>How to use</h2>
+
+      <h3>Step 1: Create a <code>.autofile</code></h3>
+      <p>Create a file named <code>.autofile</code> in your project directory and define command blocks. Each block has a name and a list of commands.</p>
+      <pre><code># This is a comment
+dev {
+  $ taskkill /im node.exe
+  - mongod.exe --dbpath C:\data\db
+  + node server.js
+  + python fileserver.py
+  + set PORT=4000 && npm start --prefix client
+}</code></pre>
+
+      <h3>Step 2: Run Auto</h3>
+      <p>In a terminal, from the same directory (or a subdirectory) as your <code>.autofile</code>, run:</p>
+      <pre><code>auto dev</code></pre>
+      <p>To use a custom file (name must start with <code>.</code>):</p>
+      <pre><code>auto -f .autofile dev</code></pre>
+    </section>
+
+    <section class="doc-section" id="command-syntax">
+      <h2>Command syntax</h2>
+      <p>Each command line in a block starts with a mode symbol, then the command. Supported modes:</p>
+      <table class="doc-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Mode</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>+</code></td>
+            <td>Normal</td>
+            <td>Runs in a normal <code>cmd</code> window.</td>
+          </tr>
+          <tr>
+            <td><code>-</code></td>
+            <td>Minimized</td>
+            <td>Runs in a minimized <code>cmd</code> window.</td>
+          </tr>
+          <tr>
+            <td><code>$</code></td>
+            <td>Background</td>
+            <td>Runs in the background (no window).</td>
+          </tr>
+          <tr>
+            <td><code>&</code></td>
+            <td>Windows Terminal</td>
+            <td>Runs in Windows Terminal with a custom tab title: <code>& "Title" command</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Commands whose first token is <code>wt</code> are passed through unchanged to support full Windows Terminal options. Arguments can be quoted; quoted parts are one argument and surrounding quotes are removed.</p>
+
+      <h3>Example</h3>
+      <pre><code>production {
+  $ nginx.exe
+  $ redis-server.exe
+  + node app.js
+  - pm2 monit
+  & "API" node server.js
+  & "Worker" npm run worker
+}</code></pre>
+    </section>
+
+    <section class="doc-section" id="special-blocks">
+      <h2>Special blocks</h2>
+      <p>Blocks whose name starts with <code>.</code> (dot) can be run by name like any other block, e.g. <code>auto .init</code>:</p>
+      <pre><code>.init {
+  + echo "Initializing environment..."
+  + npm install
+}</code></pre>
+    </section>
+
+    <section class="doc-section" id="important-notes">
+      <h2>Important notes</h2>
+      <h3>Running processes</h3>
+      <ul>
+        <li>Do not run <code>auto</code> again while processes from the same <code>.autofile</code> are still running.</li>
+        <li>Some commands support only one instance; rerunning can cause errors.</li>
+        <li>Stop existing processes before running <code>auto</code> again.</li>
+      </ul>
+      <h3>Best practices</h3>
+      <ul>
+        <li>Use clear block names (e.g. <code>dev</code>, <code>production</code>, <code>test</code>).</li>
+        <li>Add comments to document your automation.</li>
+        <li>Group related commands in the same block.</li>
+        <li>Use <code>$</code> for services that don’t need interaction, <code>-</code> for monitoring tools.</li>
+      </ul>
+    </section>
+
+    <section class="doc-section">
+      <h2>VS Code extension</h2>
+      <p>For syntax highlighting and better editing of <code>.autofile</code> in VS Code, install the <a href="https://github.com/marcuwynu23/autofile-extension" target="_blank" rel="noopener">autofile-extension</a>. It highlights labels, operators (<code>+</code>, <code>-</code>, <code>$</code>), and commands.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-credit">Made with ❤️ by <a href="https://github.com/marcuwynu23" target="_blank" rel="noopener">Mark Wayne Menorca</a></p>
+      <div class="footer-links">
+        <a href="https://github.com/marcuwynu23/Auto" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/marcuwynu23/Auto/issues" target="_blank" rel="noopener">Report Bug</a>
+        <a href="https://github.com/marcuwynu23/Auto/issues" target="_blank" rel="noopener">Request Feature</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
