@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Repositories — Auto</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;700&display=swap"
+    rel="stylesheet" />
   <style>
     :root {
       --bg: #fafafa;
@@ -18,14 +20,18 @@
       --accent: #1793d1;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: 'Ubuntu', system-ui, sans-serif;
+      font-family: 'Google Sans', system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
@@ -42,7 +48,10 @@
     }
 
     @media (min-width: 576px) {
-      .container-fluid { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .container-fluid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
     }
 
     .header {
@@ -66,7 +75,9 @@
     }
 
     @media (min-width: 576px) {
-      .header-inner { padding: 0 1.5rem; }
+      .header-inner {
+        padding: 0 1.5rem;
+      }
     }
 
     .logo {
@@ -76,7 +87,10 @@
       text-decoration: none;
     }
 
-    .nav { display: flex; gap: 0.25rem; }
+    .nav {
+      display: flex;
+      gap: 0.25rem;
+    }
 
     .nav a {
       color: #a3a3a3;
@@ -85,7 +99,9 @@
       padding: 0.4rem 0.6rem;
     }
 
-    .nav a:hover { color: #fafafa; }
+    .nav a:hover {
+      color: #fafafa;
+    }
 
     .page-title {
       font-size: 1.5rem;
@@ -132,7 +148,9 @@
       font-size: 0.9rem;
     }
 
-    .repo-card a:hover { text-decoration: underline; }
+    .repo-card a:hover {
+      text-decoration: underline;
+    }
 
     .footer {
       position: fixed;
@@ -160,7 +178,9 @@
     }
 
     @media (min-width: 576px) {
-      .footer-inner { padding: 0 1.5rem; }
+      .footer-inner {
+        padding: 0 1.5rem;
+      }
     }
 
     .footer-credit {
@@ -204,39 +224,164 @@
       background: rgba(23, 147, 209, 0.1);
     }
 
-    .nav-toggle { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 44px; height: 44px; padding: 0; border: none; background: transparent; color: #fafafa; cursor: pointer; border-radius: 8px; -webkit-tap-highlight-color: transparent; }
-    .nav-toggle:hover { background: rgba(255,255,255,0.1); }
-    .nav-toggle__bar { display: block; width: 22px; height: 2.5px; background: currentColor; border-radius: 2px; transition: transform 0.25s, opacity 0.25s; }
-    body.nav-open .nav-toggle__bar:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
-    body.nav-open .nav-toggle__bar:nth-child(2) { opacity: 0; }
-    body.nav-open .nav-toggle__bar:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
-    .nav-backdrop, .nav-drawer { display: none; }
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: #fafafa;
+      cursor: pointer;
+      border-radius: 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-toggle__bar {
+      display: block;
+      width: 22px;
+      height: 2.5px;
+      background: currentColor;
+      border-radius: 2px;
+      transition: transform 0.25s, opacity 0.25s;
+    }
+
+    body.nav-open .nav-toggle__bar:nth-child(1) {
+      transform: translateY(7.5px) rotate(45deg);
+    }
+
+    body.nav-open .nav-toggle__bar:nth-child(2) {
+      opacity: 0;
+    }
+
+    body.nav-open .nav-toggle__bar:nth-child(3) {
+      transform: translateY(-7.5px) rotate(-45deg);
+    }
+
+    .nav-backdrop,
+    .nav-drawer {
+      display: none;
+    }
+
     @media (max-width: 768px) {
-      .header-inner { position: relative; }
-      .nav-toggle { display: flex; order: 2; margin-left: auto; }
-      .header .nav { display: none; }
-      .nav-backdrop { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1001; opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s; }
-      body.nav-open .nav-backdrop { opacity: 1; visibility: visible; }
-      .nav-drawer { display: block; position: fixed; top: 0; left: 0; width: min(280px, 85vw); height: 100%; background: var(--surface); box-shadow: 4px 0 24px rgba(0,0,0,0.15); z-index: 1002; overflow-y: auto; transform: translateX(-100%); transition: transform 0.25s ease-out; }
-      body.nav-open .nav-drawer { transform: translateX(0); }
-      .nav-drawer__links { list-style: none; margin: 0; padding: 1rem 0; }
-      .nav-drawer__links li { margin: 0; }
-      .nav-drawer__links a { display: flex; align-items: center; padding: 1rem 1.5rem; color: var(--text); text-decoration: none; font-weight: 500; font-size: 1rem; transition: background 0.15s; }
-      .nav-drawer__links a:hover { background: var(--border); color: var(--accent); }
-      body.nav-open { overflow: hidden; }
-      .page-title { font-size: 1.25rem; }
-      .repo-section { margin-top: 0.5rem; }
-      .repo-card { padding: 1rem; }
-      .footer-inner { flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; }
-      .footer-links { justify-content: center; }
+      .header-inner {
+        position: relative;
+      }
+
+      .nav-toggle {
+        display: flex;
+        order: 2;
+        margin-left: auto;
+      }
+
+      .header .nav {
+        display: none;
+      }
+
+      .nav-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s, visibility 0.25s;
+      }
+
+      body.nav-open .nav-backdrop {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .nav-drawer {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: min(280px, 85vw);
+        height: 100%;
+        background: var(--surface);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+        z-index: 1002;
+        overflow-y: auto;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease-out;
+      }
+
+      body.nav-open .nav-drawer {
+        transform: translateX(0);
+      }
+
+      .nav-drawer__links {
+        list-style: none;
+        margin: 0;
+        padding: 1rem 0;
+      }
+
+      .nav-drawer__links li {
+        margin: 0;
+      }
+
+      .nav-drawer__links a {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 1rem;
+        transition: background 0.15s;
+      }
+
+      .nav-drawer__links a:hover {
+        background: var(--border);
+        color: var(--accent);
+      }
+
+      body.nav-open {
+        overflow: hidden;
+      }
+
+      .page-title {
+        font-size: 1.25rem;
+      }
+
+      .repo-section {
+        margin-top: 0.5rem;
+      }
+
+      .repo-card {
+        padding: 1rem;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.5rem;
+      }
+
+      .footer-links {
+        justify-content: center;
+      }
     }
   </style>
 </head>
+
 <body>
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">.Autofile</a>
-      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+      <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false"
+        aria-controls="nav-drawer">
         <span class="nav-toggle__bar"></span>
         <span class="nav-toggle__bar"></span>
         <span class="nav-toggle__bar"></span>
@@ -277,14 +422,16 @@
           <h3>AutoFile VS Code Extension</h3>
           <p>VS Code extension for .autofile syntax highlighting and workflows</p>
         </div>
-        <a href="https://github.com/marcuwynu23/autofile-extension" target="_blank" rel="noopener">github.com/marcuwynu23/autofile-extension</a>
+        <a href="https://github.com/marcuwynu23/autofile-extension" target="_blank"
+          rel="noopener">github.com/marcuwynu23/autofile-extension</a>
       </div>
     </div>
   </main>
 
   <footer class="footer">
     <div class="footer-inner">
-      <p class="footer-credit">Made with ❤️ by <a href="https://github.com/marcuwynu23" target="_blank" rel="noopener">Mark Wayne Menorca</a></p>
+      <p class="footer-credit">Made with ❤️ by <a href="https://github.com/marcuwynu23" target="_blank"
+          rel="noopener">Mark Wayne Menorca</a></p>
       <div class="footer-links">
         <a href="https://github.com/marcuwynu23/Auto" target="_blank" rel="noopener">GitHub</a>
         <a href="https://github.com/marcuwynu23/Auto/issues" target="_blank" rel="noopener">Report Bug</a>
@@ -294,4 +441,5 @@
   </footer>
   <script src="nav.js"></script>
 </body>
+
 </html>
