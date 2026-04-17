@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://marcuwynu23.github.io/Auto/sitemap.xml
+Sitemap: https://auto.marcuwynu.space/sitemap.xml
