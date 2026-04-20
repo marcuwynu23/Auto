@@ -862,6 +862,51 @@
         font-size: 1.05rem;
       }
     }
+
+    .what-container {
+      display: flex;
+      gap: 2rem;
+      align-items: stretch;
+      /* makes both sides equal height */
+      flex-wrap: wrap;
+    }
+
+    .what-text {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      align-items: center;
+      /* vertically centers text */
+    }
+
+    .what-video {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+    }
+
+    /* Make video taller */
+    .what-video video {
+      width: 100%;
+      height: 420px;
+      /* adjust size */
+      object-fit: cover;
+
+      border: 3px solid #1b3a4b;
+      border-radius: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .what-container {
+        flex-direction: column;
+      }
+
+      .what-video video {
+        height: 300px;
+        /* slightly smaller on mobile */
+      }
+    }
   </style>
 </head>
 
@@ -946,13 +991,27 @@
 
     <section id="what">
       <h2>What is Auto?</h2>
-      <p class="intro-text">
-        Auto is a small Windows tool that starts multiple programs or servers
-        for you from a single command. You list what you want to run in a
-        simple config file; Auto opens each one in its own window (or in the
-        background). No more opening five terminals by hand every morning—one
-        command and you’re ready to work.
-      </p>
+
+      <div class="what-container">
+        <!-- Left: Text -->
+        <div class="what-text">
+          <p class="intro-text">
+            Auto is a small Windows tool that starts multiple programs or servers
+            for you from a single command. You list what you want to run in a
+            simple config file; Auto opens each one in its own window (or in the
+            background). No more opening five terminals by hand every morning—one
+            command and you’re ready to work.
+          </p>
+        </div>
+
+        <!-- Right: Video Demo -->
+        <div class="what-video">
+          <video controls width="100%">
+            <source src="demo/demo.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
     </section>
 
     <section id="why">
