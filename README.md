@@ -36,7 +36,6 @@ A command-line tool that automates workflows by running each script command in i
 * **Comment Support**: Use comments and empty lines in scripts for readability
 * **Simple Syntax**: Easy-to-read configuration format
 * **Quoted Arguments**: Commands support quoted arguments as single units
-* **Test Mode**: Dry-run commands for testing without execution
 * **Thread-safe Output**: Console output is serialized for mixed sync and async commands
 
 ---
