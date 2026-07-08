@@ -2,8 +2,6 @@
 
 # Auto
 
-<img src="./resources/auto.ico" width="64" alt="Auto logo">
-
 <a href="https://github.com/marcuwynu23/Auto/releases"><img src="https://img.shields.io/github/v/release/marcuwynu23/Auto" alt="Release"></a>
 <a href="LICENSE"><img src="https://img.shields.io/github/license/marcuwynu23/Auto?logo=github" alt="License"></a>
 <a href="https://github.com/marcuwynu23/Auto/stargazers"><img src="https://img.shields.io/github/stars/marcuwynu23/Auto" alt="Stars"></a>
@@ -53,13 +51,13 @@ control over how multi-service workflows launch on your machine.
 
 ### Why Use It?
 
-| Problem | How Auto Solves It |
-|---|---|
-| Starting 5+ services for local dev requires opening N terminals manually | **One command** — `auto dev` launches everything |
-| Background processes clutter your taskbar | **Background mode** (`$`) runs silently with no window |
-| You need monitoring tools visible but not intrusive | **Minimized mode** (`-`) opens a reduced window |
-| Windows Terminal tabs lose context | **Named tabs** (`& "title"`) give each tab a meaningful name |
-| Team onboarding requires explaining which services to start | **`.autofile` in the repo** — documented, reproducible workflow |
+| Problem                                                                  | How Auto Solves It                                              |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| Starting 5+ services for local dev requires opening N terminals manually | **One command** — `auto dev` launches everything                |
+| Background processes clutter your taskbar                                | **Background mode** (`$`) runs silently with no window          |
+| You need monitoring tools visible but not intrusive                      | **Minimized mode** (`-`) opens a reduced window                 |
+| Windows Terminal tabs lose context                                       | **Named tabs** (`& "title"`) give each tab a meaningful name    |
+| Team onboarding requires explaining which services to start              | **`.autofile` in the repo** — documented, reproducible workflow |
 
 ### The Philosophy
 
@@ -71,13 +69,13 @@ control over how multi-service workflows launch on your machine.
 
 ## Use Cases
 
-| Scenario | How Auto Helps |
-|---|---|
+| Scenario                    | How Auto Helps                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------- |
 | **Local microservices dev** | Start API, web app, database, and worker in separate terminals with one command |
-| **CI/CD debugging** | Reproduce workflow steps locally with the same command structure |
-| **Project onboarding** | New devs run `auto setup` to install deps, start services, and open monitoring |
-| **Multi-service testing** | Launch test runners, mock servers, and watchers in parallel |
-| **Production adjacents** | Start nginx, redis, app server, and monitoring side by side |
+| **CI/CD debugging**         | Reproduce workflow steps locally with the same command structure                |
+| **Project onboarding**      | New devs run `auto setup` to install deps, start services, and open monitoring  |
+| **Multi-service testing**   | Launch test runners, mock servers, and watchers in parallel                     |
+| **Production adjacents**    | Start nginx, redis, app server, and monitoring side by side                     |
 
 ---
 
@@ -96,20 +94,20 @@ control over how multi-service workflows launch on your machine.
 
 ## Advantages Over Other Tools
 
-| Aspect | Auto | Manual (cmd windows) | Docker Compose | tmux / screen |
-|---|---|---|---|---|
-| **Setup time** | ~10 seconds | Ongoing effort | Minutes (requires Docker) | Not available on Windows |
-| **Windows native** | Yes | Yes | Partial (WSL) | No |
-| **Multiple terminal windows** | Yes | Manual | No (logs only) | No (panes only) |
-| **Per-command visibility control** | Yes | Manual | No | Partial |
-| **Windows Terminal integration** | Yes | Manual | No | No |
-| **Custom tab titles** | Yes | No | No | No |
-| **Background execution** | Yes | Manual | Yes | No |
-| **Configuration file** | Single `.autofile` | None | `docker-compose.yml` | `.tmux.conf` |
-| **Learning curve** | 2 minutes | None | Moderate | Steep |
-| **CI integration** | Via `AUTO_TEST_MODE` | Scripts | Native | No |
-| **License** | Apache 2.0 | N/A | Apache 2.0 | BSD |
-| **Runtime dependency** | None | Shell | Docker daemon | tmux package |
+| Aspect                             | Auto                 | Manual (cmd windows) | Docker Compose            | tmux / screen            |
+| ---------------------------------- | -------------------- | -------------------- | ------------------------- | ------------------------ |
+| **Setup time**                     | ~10 seconds          | Ongoing effort       | Minutes (requires Docker) | Not available on Windows |
+| **Windows native**                 | Yes                  | Yes                  | Partial (WSL)             | No                       |
+| **Multiple terminal windows**      | Yes                  | Manual               | No (logs only)            | No (panes only)          |
+| **Per-command visibility control** | Yes                  | Manual               | No                        | Partial                  |
+| **Windows Terminal integration**   | Yes                  | Manual               | No                        | No                       |
+| **Custom tab titles**              | Yes                  | No                   | No                        | No                       |
+| **Background execution**           | Yes                  | Manual               | Yes                       | No                       |
+| **Configuration file**             | Single `.autofile`   | None                 | `docker-compose.yml`      | `.tmux.conf`             |
+| **Learning curve**                 | 2 minutes            | None                 | Moderate                  | Steep                    |
+| **CI integration**                 | Via `AUTO_TEST_MODE` | Scripts              | Native                    | No                       |
+| **License**                        | Apache 2.0           | N/A                  | Apache 2.0                | BSD                      |
+| **Runtime dependency**             | None                 | Shell                | Docker daemon             | tmux package             |
 
 ---
 
@@ -176,19 +174,19 @@ auto dev
 
 Execute a block from the default `.autofile` file.
 
-| Argument     | Description                        |
-|--------------|------------------------------------|
-| `block_name` | Name of the block to execute       |
+| Argument     | Description                  |
+| ------------ | ---------------------------- |
+| `block_name` | Name of the block to execute |
 
 ### `auto -f <file_path> <block_name>`
 
 Execute a block from a custom hidden file.
 
-| Flag         | Default   | Description                              |
-|--------------|-----------|------------------------------------------|
-| `-f`         | —         | Flag to specify a custom file path       |
-| `file_path`  | —         | Path to a hidden file (must start with `.`) |
-| `block_name` | —         | Name of the block to execute             |
+| Flag         | Default | Description                                 |
+| ------------ | ------- | ------------------------------------------- |
+| `-f`         | —       | Flag to specify a custom file path          |
+| `file_path`  | —       | Path to a hidden file (must start with `.`) |
+| `block_name` | —       | Name of the block to execute                |
 
 #### Examples
 
@@ -215,12 +213,12 @@ blockname {
 }
 ```
 
-| Symbol | Mode             | Description                                |
-|--------|------------------|--------------------------------------------|
-| `+`    | Normal           | Opens a normal terminal window             |
-| `-`    | Minimized        | Opens a minimized window                   |
-| `$`    | Background       | Runs silently in the background            |
-| `&`    | Windows Terminal | Opens a Windows Terminal tab with a title  |
+| Symbol | Mode             | Description                               |
+| ------ | ---------------- | ----------------------------------------- |
+| `+`    | Normal           | Opens a normal terminal window            |
+| `-`    | Minimized        | Opens a minimized window                  |
+| `$`    | Background       | Runs silently in the background           |
+| `&`    | Windows Terminal | Opens a Windows Terminal tab with a title |
 
 ### Example
 
@@ -297,13 +295,13 @@ Set `AUTO_TEST_MODE=1` to prevent actual command execution in CI pipelines.
 
 ### Prerequisites
 
-| Tool          | Version   | Purpose                       |
-|---------------|-----------|-------------------------------|
-| C++ compiler  | C++11+    | Compile source                |
-| Clang/LLVM    | Latest    | Primary compiler (CI)         |
-| MinGW-w64     | Latest    | `windres` for icon resources  |
-| Make          | Any       | Build automation              |
-| CMake         | 3.16+     | Alternative build system      |
+| Tool         | Version | Purpose                      |
+| ------------ | ------- | ---------------------------- |
+| C++ compiler | C++11+  | Compile source               |
+| Clang/LLVM   | Latest  | Primary compiler (CI)        |
+| MinGW-w64    | Latest  | `windres` for icon resources |
+| Make         | Any     | Build automation             |
+| CMake        | 3.16+   | Alternative build system     |
 
 ### Build
 
