@@ -15,7 +15,6 @@ Windows Terminal modes.
 - [Configuration](#configuration)
 - [Templates](#templates)
 - [Concepts](#concepts)
-- [CI/CD Integration](#cicd-integration)
 - [Workflows](#workflows)
 - [Troubleshooting](#troubleshooting)
 - [FAQ](#faq)
@@ -304,39 +303,6 @@ Commands within a block execute sequentially. However:
   (the tool continues to the next command immediately)
 - Synchronous commands (`+`, `-`) wait for the terminal window to open
   but do not wait for the command inside to complete
-
----
-
-## CI/CD Integration
-
-### GitHub Actions
-
-```yaml
-- name: Run Auto smoke test
-  shell: pwsh
-  env:
-    AUTO_TEST_MODE: "1"
-  run: |
-    "@test {`n  + echo hello`n}" | Out-File -FilePath ".autofile" -Encoding utf8
-    auto test
-```
-
-The `AUTO_TEST_MODE=1` environment variable prevents Auto from actually
-executing commands (for safe CI testing).
-
-### Testing
-
-Auto's own test suite runs on `windows-latest` in GitHub Actions:
-
-```yaml
-- name: Build Tests
-  run: make -B -f llvm.makefile test
-
-- name: Run Tests
-  env:
-    AUTO_TEST_MODE: "1"
-  run: make -f llvm.makefile test-run
-```
 
 ---
 

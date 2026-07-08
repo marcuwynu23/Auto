@@ -27,9 +27,7 @@
 - [CLI Reference](#cli-reference)
 - [Configuration](#configuration)
 - [Examples](#examples)
-- [CI/CD Integration](#cicd-integration)
 - [Development](#development)
-- [Architecture](#architecture)
 
 ---
 
@@ -71,9 +69,10 @@ control over how multi-service workflows launch on your machine.
 
 | Scenario                    | How Auto Helps                                                                  |
 | --------------------------- | ------------------------------------------------------------------------------- |
+| **Project onboarding**      | New devs run `auto setup` to install deps, start services, and open monitoring  |
+| **Streamline & document**   | Replace tribal knowledge with a version-controlled `.autofile` that documents every command needed to run the project |
 | **Local microservices dev** | Start API, web app, database, and worker in separate terminals with one command |
 | **CI/CD debugging**         | Reproduce workflow steps locally with the same command structure                |
-| **Project onboarding**      | New devs run `auto setup` to install deps, start services, and open monitoring  |
 | **Multi-service testing**   | Launch test runners, mock servers, and watchers in parallel                     |
 | **Production adjacents**    | Start nginx, redis, app server, and monitoring side by side                     |
 
@@ -94,20 +93,20 @@ control over how multi-service workflows launch on your machine.
 
 ## Advantages Over Other Tools
 
-| Aspect                             | Auto                 | Manual (cmd windows) | Docker Compose            | tmux / screen            |
-| ---------------------------------- | -------------------- | -------------------- | ------------------------- | ------------------------ |
-| **Setup time**                     | ~10 seconds          | Ongoing effort       | Minutes (requires Docker) | Not available on Windows |
-| **Windows native**                 | Yes                  | Yes                  | Partial (WSL)             | No                       |
-| **Multiple terminal windows**      | Yes                  | Manual               | No (logs only)            | No (panes only)          |
-| **Per-command visibility control** | Yes                  | Manual               | No                        | Partial                  |
-| **Windows Terminal integration**   | Yes                  | Manual               | No                        | No                       |
-| **Custom tab titles**              | Yes                  | No                   | No                        | No                       |
-| **Background execution**           | Yes                  | Manual               | Yes                       | No                       |
-| **Configuration file**             | Single `.autofile`   | None                 | `docker-compose.yml`      | `.tmux.conf`             |
-| **Learning curve**                 | 2 minutes            | None                 | Moderate                  | Steep                    |
-| **CI integration**                 | Via `AUTO_TEST_MODE` | Scripts              | Native                    | No                       |
-| **License**                        | Apache 2.0           | N/A                  | Apache 2.0                | BSD                      |
-| **Runtime dependency**             | None                 | Shell                | Docker daemon             | tmux package             |
+| Aspect                             | Auto                 | Manual (cmd windows) |
+| ---------------------------------- | -------------------- | -------------------- |
+| **Setup time**                     | ~10 seconds          | Ongoing effort       |
+| **Windows native**                 | Yes                  | Yes                  |
+| **Multiple terminal windows**      | Yes                  | Manual               |
+| **Per-command visibility control** | Yes                  | Manual               |
+| **Windows Terminal integration**   | Yes                  | Manual               |
+| **Custom tab titles**              | Yes                  | No                   |
+| **Background execution**           | Yes                  | Manual               |
+| **Configuration file**             | Single `.autofile`   | None                 |
+| **Learning curve**                 | 2 minutes            | None                 |
+| **CI integration**                 | Via `AUTO_TEST_MODE` | Scripts              |
+| **License**                        | Apache 2.0           | N/A                  |
+| **Runtime dependency**             | None                 | Shell                |
 
 ---
 
@@ -273,24 +272,6 @@ auto .init
 
 ---
 
-## CI/CD Integration
-
-### GitHub Actions (safe mode)
-
-```yaml
-- name: Smoke test
-  shell: pwsh
-  env:
-    AUTO_TEST_MODE: "1"
-  run: |
-    "@test {`n  + echo hello`n}" | Out-File -FilePath ".autofile" -Encoding utf8
-    .\auto.exe test
-```
-
-Set `AUTO_TEST_MODE=1` to prevent actual command execution in CI pipelines.
-
----
-
 ## Development
 
 ### Prerequisites
@@ -327,41 +308,18 @@ make -f llvm.makefile test
 make -f llvm.makefile test-run
 ```
 
-### Project Structure
-
-```
-Auto/
-├── src/main.cpp       # CLI entry point
-├── src/lib.cpp        # Core engine
-├── include/lib.h      # Public API header
-├── test/test_main.cpp # Test suite (10 suites, 30+ tests)
-├── resources/         # Icons and resource scripts
-├── makefile           # GNU Make (MinGW)
-├── llvm.makefile      # GNU Make (LLVM/Clang)
-├── CMakeLists.txt     # CMake build
-└── CMakePresets.json  # CMake presets
-```
-
 ---
 
-## Architecture
+## License
 
-- **`main.cpp`** — Parses CLI arguments (`auto <block>` or `auto -f <file> <block>`), calls `autoRunner()`
-- **`lib.cpp`** — Core engine: reads `.autofile`, tokenizes blocks, maps mode symbols to `start` commands, dispatches execution
-- **Execution modes** — `cmd /K` for interactive windows, `cmd /C` for background, `wt -w 0 new-tab` for Windows Terminal
-- **Thread safety** — A `std::mutex` serializes console output across sync and async commands
-- **Test mode** — `AUTO_TEST_MODE=1` env var suppresses `system()` calls for safe CI execution
-- **Working directory** — Resolved to the `.autofile`'s parent directory using `GetFullPathNameA`
+This project is licensed under the [Apache 2.0 License](LICENSE).
+
+Apache 2.0 is a permissive license that allows anyone to use, modify, and distribute the software freely, while still providing patent protection and requiring attribution. It strikes a balance between openness for the community and protection for contributors.
 
 ---
 
 <div align="center">
 
-Made by [Mark Wayne Menorca](https://github.com/marcuwynu23)
-
-[Star this repo](https://github.com/marcuwynu23/Auto) •
-[Report Bug](https://github.com/marcuwynu23/Auto/issues) •
-[Request Feature](https://github.com/marcuwynu23/Auto/issues) •
-[Contribute](CONTRIBUTING.md)
+Happy Coding!
 
 </div>
