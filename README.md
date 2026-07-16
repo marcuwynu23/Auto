@@ -1,6 +1,6 @@
 <div align="center">
 
-# Auto
+<img src="./resources/logo.svg" width="420" alt="Auto logo">
 
 <a href="https://github.com/marcuwynu23/Auto/releases"><img src="https://img.shields.io/github/v/release/marcuwynu23/Auto" alt="Release"></a>
 <a href="LICENSE"><img src="https://img.shields.io/github/license/marcuwynu23/Auto?logo=github" alt="License"></a>
@@ -67,14 +67,14 @@ control over how multi-service workflows launch on your machine.
 
 ## Use Cases
 
-| Scenario                    | How Auto Helps                                                                  |
-| --------------------------- | ------------------------------------------------------------------------------- |
-| **Project onboarding**      | New devs run `auto setup` to install deps, start services, and open monitoring  |
+| Scenario                    | How Auto Helps                                                                                                        |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Project onboarding**      | New devs run `auto setup` to install deps, start services, and open monitoring                                        |
 | **Streamline & document**   | Replace tribal knowledge with a version-controlled `.autofile` that documents every command needed to run the project |
-| **Local microservices dev** | Start API, web app, database, and worker in separate terminals with one command |
-| **CI/CD debugging**         | Reproduce workflow steps locally with the same command structure                |
-| **Multi-service testing**   | Launch test runners, mock servers, and watchers in parallel                     |
-| **Production adjacents**    | Start nginx, redis, app server, and monitoring side by side                     |
+| **Local microservices dev** | Start API, web app, database, and worker in separate terminals with one command                                       |
+| **CI/CD debugging**         | Reproduce workflow steps locally with the same command structure                                                      |
+| **Multi-service testing**   | Launch test runners, mock servers, and watchers in parallel                                                           |
+| **Production adjacents**    | Start nginx, redis, app server, and monitoring side by side                                                           |
 
 ---
 
